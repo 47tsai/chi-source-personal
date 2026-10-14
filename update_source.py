@@ -374,15 +374,23 @@ def main():
 
     try:
         config = json.loads(SOURCES_FILE.read_text(encoding="utf-8"))
-        sources = config.get("sources") if isinstance(config, dict) else None
-        if not isinstance(sources, list) or not sources:
-            raise ValueError("app_config.json must contain a non-empty sources array")
+        app_configs = config.get("apps") if isinstance(config, dict) else None
+        if not isinstance(app_configs, list) or not app_configs or not all(isinstance(app, dict) for app in app_configs):
+            raise ValueError("app_config.json must contain a non-empty apps array")
+
+        sources = []
+        seen_source_urls = set()
+        for app_config in app_configs:
+            source_name = app_config.get("source_name")
+            source_url = app_config.get("source_url")
+            if not isinstance(source_name, str) or not source_name.strip() or not is_https_url(source_url):
+                raise ValueError(f"Invalid source configuration for {app_config.get('name', 'Unknown')}")
+            if source_url not in seen_source_urls:
+                seen_source_urls.add(source_url)
+                sources.append({"name": source_name, "url": source_url})
 
         catalogs = load_catalogs(create_session(), sources)
-        excluded_bundle_ids = config.get("excludedBundleIdentifiers", [])
-        if not isinstance(excluded_bundle_ids, list) or not all(isinstance(item, str) and item.strip() for item in excluded_bundle_ids):
-            raise ValueError("excludedBundleIdentifiers must be an array of non-empty strings")
-        source = build_source(catalogs, excluded_bundle_ids)
+        source = build_source(catalogs)
         old_source = {}
         if OUTPUT_FILE.exists():
             try:
