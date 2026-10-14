@@ -125,6 +125,12 @@ def normalize_version(raw, app_name):
     return normalized
 
 
+def format_app_subtitle(author, date=None):
+    """Match the original source style: author followed by the release date."""
+    date = str(date or "")[:10]
+    return f"{author}（{date}）" if date else str(author)
+
+
 def normalize_app(raw, source_name):
     if not isinstance(raw, dict):
         raise ValueError(f"{source_name}: app entry is not an object")
@@ -172,7 +178,10 @@ def normalize_app(raw, source_name):
         "name": name.strip(),
         "bundleIdentifier": bundle_id.strip(),
         "developerName": raw.get("developerName") or source_name,
-        "subtitle": raw.get("subtitle") or SUBTITLE_OVERRIDES.get(bundle_id.strip()) or name.strip(),
+        "subtitle": format_app_subtitle(
+            raw.get("developerName") or source_name,
+            versions[0].get("date", ""),
+        ),
         "localizedDescription": raw.get("localizedDescription") or "",
         "iconURL": icon_url,
         "tintColor": tint,
@@ -244,7 +253,7 @@ def build_source(catalogs, allowed_bundle_ids=None):
         "name": SOURCE_NAME,
         "identifier": SOURCE_IDENTIFIER,
         "sourceURL": SOURCE_URL,
-        "subtitle": "個人精選的 ACG、小眾 App 與興趣工具",
+        "subtitle": "Chi's Personal IPA Source",
         "description": (
             "Chi Source Personal 是個人興趣向的 AltStore / SideStore Source。"
             "App 資訊與版本由各專案的公開來源同步，請留意各 App 的使用條款與權限。"
