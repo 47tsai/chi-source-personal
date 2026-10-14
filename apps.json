@@ -10,7 +10,11 @@
     "com.nianticlabs.pokemongo",
     "org.animeko.animeko",
     "com.example.kazumi",
-    "app.aidoku.Aidoku"
+    "app.aidoku.Aidoku",
+    "com.g8row.photosbackup",
+    "com.mak5er.aircard",
+    "com.yangjiii.EnsWilde",
+    "com.stik.stikdebug"
   ],
   "apps": [
     {
@@ -1320,6 +1324,177 @@
           "buildVersion": "3"
         }
       ]
+    },
+    {
+      "name": "Photos Backup",
+      "bundleIdentifier": "com.g8row.photosbackup",
+      "developerName": "g8row",
+      "localizedDescription": "## New\n\n- **The Google Photos app now counts what this app backs up.** ([#24](https://github.com/g8row/PhotosBackup/pull/24), thanks @saileshbro) Uploads showed as \"not backed up\" in the Google Photos app, and its own **Free up space** never offered them. It now recognises them, and its **Free up space** and **Delete from device** remove the photos from your iPhone. On one library of about 8,500 items, \"Not backed up\" went from 8,145 to 0 and **Free up space** from 2 items to 461.\n\n  The reason was the version being uploaded. The Google Photos app only counts a photo it can match to the one on your iPhone, so an **edited** photo or video now backs up as it looks, not as its unedited original. A photo you edited in the Google Photos app also needs the version that edit was applied on, which is uploaded in an extra step.\n\n- **Back Up Live Photo Motion.** Off by default. With it on, a Live Photo's motion is attached to the still already in your account, so it plays as a Live Photo and **Free up space** will offer it. Live Photos backed up earlier get their motion added as a backlog — this can be tens of GB, which is why it is a setting you turn on.\n\n- **Backup keeps going after you leave the app (iOS 26).** While the app is open with work to do, iOS is asked to keep it running; progress then shows in a Live Activity, where you can also stop it. Up to 2 uploads run at once in the background. On earlier iOS versions nothing changes.\n\n## Fixed\n\n- **Automatic Backup never ran in the background on SideStore installs.** This affected every sideloaded install and was not new in this release. SideStore renames the app when it signs it, so the background task the app registered no longer matched the one it declared, and iOS refused it — meaning **Automatic Backup never got a background window at all**. The app now reads the name from its own build. ([#2](https://github.com/g8row/PhotosBackup/issues/2))\n\n- **Google's rate limit no longer fails a row.** When Google asked the app to slow down (HTTP 429), rows retried a second apart, met the same refusal, and failed. The whole queue now waits it out — a minute, doubling up to ten while Google keeps refusing — and carries on.\n\n- **Items marked \"Cancelled\" with no reason.** ([#19](https://github.com/g8row/PhotosBackup/issues/19)) If the app was interrupted part way through an item, that row was marked \"Cancelled\" and left with nothing to explain it and nothing to retry it, which is why the same photo could appear as both \"Cancelled\" and \"Already backed up\". An interruption now retries, and if it keeps happening it says what went wrong. \"Cancelled\" now only ever means you stopped it, and reads **Stopped by you**.\n\n- **The activity list got faster on big backups.** ([#8](https://github.com/g8row/PhotosBackup/issues/8)) As each item finished, the app was asking the photo library about it twice on the same thread that draws the list. It asks once now.\n\n- **Photos deleted while still queued.** Freeing space on your iPhone deletes photos that may still be waiting to upload. Those rows are dropped quietly instead of failing with \"no longer in your photo library\" — about 2,000 rows had failed that way on one library.\n\n- **Hand-picked photos are re-checked** even when the app already remembers them as backed up.\n\n## Verifying this release\n\n- **The `.ipa` is built by GitHub Actions from the tagged commit**, not on a laptop, and is attached with its SHA-256 as `PhotosBackup.ipa.sha256`. ([#17](https://github.com/g8row/PhotosBackup/pull/17), thanks @nonnapopoa, raised in [#15](https://github.com/g8row/PhotosBackup/issues/15)) You can check the file you downloaded with `shasum -a 256 PhotosBackup.ipa` and compare, and the build log shows which commit and toolchain produced it.\n- Every pull request and every push now runs the test suite before it can land.\n\n## Worth knowing\n\n- **An edited photo now backs up its edit, not its original.** Originals already uploaded stay in your account, but a newly edited photo no longer uploads its unedited version. Google's own backup behaves the same way.\n- After updating, the app queues a one-time re-check of edited photos already backed up. Most settle without uploading anything.\n- **A photo saved to your iPhone from Google Photos is never counted as backed up**, even though it is in your library. Editing it in Apple Photos works around this.\n\n## Notes\n\n- 191 tests, 189 passing (2 opt-in live tests skipped).\n- Tested on an iPhone 16 Pro Max (iOS 26.6.1, Google Photos 7.92.0) across a full library, and on a SideStore-signed install where the background tasks now register and run.\n- `docs/google-photos-backed-up-rules.md` records each rule and the on-device evidence behind it.\n",
+      "iconURL": "https://raw.githubusercontent.com/g8row/PhotosBackup/main/App/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
+      "versions": [
+        {
+          "version": "0.3.7",
+          "date": "2026-09-20T16:10:16Z",
+          "localizedDescription": "## New\n\n- **The Google Photos app now counts what this app backs up.** ([#24](https://github.com/g8row/PhotosBackup/pull/24), thanks @saileshbro) Uploads showed as \"not backed up\" in the Google Photos app, and its own **Free up space** never offered them. It now recognises them, and its **Free up space** and **Delete from device** remove the photos from your iPhone. On one library of about 8,500 items, \"Not backed up\" went from 8,145 to 0 and **Free up space** from 2 items to 461.\n\n  The reason was the version being uploaded. The Google Photos app only counts a photo it can match to the one on your iPhone, so an **edited** photo or video now backs up as it looks, not as its unedited original. A photo you edited in the Google Photos app also needs the version that edit was applied on, which is uploaded in an extra step.\n\n- **Back Up Live Photo Motion.** Off by default. With it on, a Live Photo's motion is attached to the still already in your account, so it plays as a Live Photo and **Free up space** will offer it. Live Photos backed up earlier get their motion added as a backlog — this can be tens of GB, which is why it is a setting you turn on.\n\n- **Backup keeps going after you leave the app (iOS 26).** While the app is open with work to do, iOS is asked to keep it running; progress then shows in a Live Activity, where you can also stop it. Up to 2 uploads run at once in the background. On earlier iOS versions nothing changes.\n\n## Fixed\n\n- **Automatic Backup never ran in the background on SideStore installs.** This affected every sideloaded install and was not new in this release. SideStore renames the app when it signs it, so the background task the app registered no longer matched the one it declared, and iOS refused it — meaning **Automatic Backup never got a background window at all**. The app now reads the name from its own build. ([#2](https://github.com/g8row/PhotosBackup/issues/2))\n\n- **Google's rate limit no longer fails a row.** When Google asked the app to slow down (HTTP 429), rows retried a second apart, met the same refusal, and failed. The whole queue now waits it out — a minute, doubling up to ten while Google keeps refusing — and carries on.\n\n- **Items marked \"Cancelled\" with no reason.** ([#19](https://github.com/g8row/PhotosBackup/issues/19)) If the app was interrupted part way through an item, that row was marked \"Cancelled\" and left with nothing to explain it and nothing to retry it, which is why the same photo could appear as both \"Cancelled\" and \"Already backed up\". An interruption now retries, and if it keeps happening it says what went wrong. \"Cancelled\" now only ever means you stopped it, and reads **Stopped by you**.\n\n- **The activity list got faster on big backups.** ([#8](https://github.com/g8row/PhotosBackup/issues/8)) As each item finished, the app was asking the photo library about it twice on the same thread that draws the list. It asks once now.\n\n- **Photos deleted while still queued.** Freeing space on your iPhone deletes photos that may still be waiting to upload. Those rows are dropped quietly instead of failing with \"no longer in your photo library\" — about 2,000 rows had failed that way on one library.\n\n- **Hand-picked photos are re-checked** even when the app already remembers them as backed up.\n\n## Verifying this release\n\n- **The `.ipa` is built by GitHub Actions from the tagged commit**, not on a laptop, and is attached with its SHA-256 as `PhotosBackup.ipa.sha256`. ([#17](https://github.com/g8row/PhotosBackup/pull/17), thanks @nonnapopoa, raised in [#15](https://github.com/g8row/PhotosBackup/issues/15)) You can check the file you downloaded with `shasum -a 256 PhotosBackup.ipa` and compare, and the build log shows which commit and toolchain produced it.\n- Every pull request and every push now runs the test suite before it can land.\n\n## Worth knowing\n\n- **An edited photo now backs up its edit, not its original.** Originals already uploaded stay in your account, but a newly edited photo no longer uploads its unedited version. Google's own backup behaves the same way.\n- After updating, the app queues a one-time re-check of edited photos already backed up. Most settle without uploading anything.\n- **A photo saved to your iPhone from Google Photos is never counted as backed up**, even though it is in your library. Editing it in Apple Photos works around this.\n\n## Notes\n\n- 191 tests, 189 passing (2 opt-in live tests skipped).\n- Tested on an iPhone 16 Pro Max (iOS 26.6.1, Google Photos 7.92.0) across a full library, and on a SideStore-signed install where the background tasks now register and run.\n- `docs/google-photos-backed-up-rules.md` records each rule and the on-device evidence behind it.\n",
+          "downloadURL": "https://github.com/g8row/PhotosBackup/releases/download/0.3.7/PhotosBackup.ipa",
+          "size": 2716224,
+          "minOSVersion": "15.0"
+        }
+      ],
+      "subtitle": "Photos Backup",
+      "tintColor": "#777777",
+      "category": "other",
+      "screenshots": [],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "AirCard-iOS",
+      "bundleIdentifier": "com.mak5er.aircard",
+      "developerName": "Mak5er",
+      "subtitle": "Apple Wallet card skins, passcode themes, and wallpapers",
+      "localizedDescription": "Customize Apple Wallet card artwork, passcode themes, and PosterBoard wallpapers on supported iOS versions.",
+      "iconURL": "https://raw.githubusercontent.com/Mak5er/AirCard-iOS/main/ios-app/Assets.xcassets/AppIcon.appiconset/AppIcon.png",
+      "tintColor": "#6750A4",
+      "category": "utilities",
+      "versions": [
+        {
+          "version": "1.3.2",
+          "buildVersion": "v1.3.2",
+          "date": "2026-10-04T12:22:53Z",
+          "downloadURL": "https://github.com/Mak5er/AirCard-iOS/releases/download/v1.3.2/AirCard-iOS.ipa",
+          "size": 4638147,
+          "localizedDescription": "## What's Changed in v1.3.2 🚀\n\nThis update brings full feature parity with AirCard macOS v1.2.6, restores robust card discovery across all iOS versions, introduces automatic bank/network recognition with custom card nicknames, delivers an ultra-fast tunnel cache (0.02s connections), and completely resolves wallpaper flashing for Collections and Mercury wallpapers.\n\n### 💳 Wallet Card Discovery & Bank Identification\n• **Universal Wallet Log Parser**: Ported the proven `WalletScanParser` from AirCard macOS. Captures cards from `Dashboard loading (...): for SOO+`, `passIDs[InSession]`, `passIDs[global]`, and modern JSON NFC activations (`\"identifier\": \"HEX\"`).\n• **Automatic Bank & Network Detection**: Recognizes Visa, Mastercard, American Express, UnionPay, Discover, and JCB via applet AIDs during selection.\n• **Card Nicknames (Rename)**: Added a direct **Rename** button (✏️) so you can give your cards friendly names like *\"Monobank\"*, *\"Salary Card\"*, or *\"Revolut\"*, safely persisted in app settings.\n• **28-Character Fallback Token Matcher**: Restores dependable card discovery on devices where standard log patterns are redacted.\n\n### ⚡ Ultra-Fast Tunnel Routing (from 10s to 0.02s!)\n• **Working Route Caching**: `rust-core` now caches the active RSD connection route (`LAST_WORKING_ROUTE`), eliminating repeated port and interface scanning.\n• **RSD-First Priority**: Connects directly via RemoteXPC on port 49152, bypassing slow Lockdown retries and broken pipes on iOS 18+.\n• **Eliminated Loopback Policy Drops**: Removed local loopback attempts that caused `policy drop` control channel errors.\n\n### 🖼 Wallpapers (.tendies) — Collections & Mercury Fixes\n• **Dual Injection on iOS 18+**: Wallpapers are now injected into both their primary bundle (`com.apple.WallpaperKit.CollectionsPoster` or `com.apple.MercuryPoster`) and the modern iOS 18+ application container (`com.apple.Posters.CollectionsPosterApp` / `com.apple.Posters.MercuryPosterApp`).\n• **Metadata Synchronization**: Fixed a critical issue where `Wallpaper.plist`'s numeric identifier was randomized out-of-sync with `suggestionMetadata.plist` (`7400.DYNAMIC`), causing wallpapers like Windows 11 to vanish from the Lock Screen gallery.\n• **Mercury Wallpaper Support**: Added recognition for `mercury-descriptors` container folders and registered `com.apple.Posters.MercuryPosterApp` in `PersistedPosterContainerBundleIdentifiers`.\n• **NeoSpring Respring**: Instant springboard reload to apply wallpaper preferences immediately.\n\n### 🧪 Quality & Testing\n• All 24 unit tests passing (`TendiesEngineTests`, `WalletScanParserTests`, `CardPhotoCropTests`, `CardPhotoPickerTests`).\n\n**Full Changelog**: https://github.com/Mak5er/AirCard-iOS/compare/v1.3.1...v1.3.2\n"
+        },
+        {
+          "version": "1.3.1",
+          "buildVersion": "v1.3.1",
+          "date": "2026-10-01T23:01:18Z",
+          "downloadURL": "https://github.com/Mak5er/AirCard-iOS/releases/download/v1.3.1/AirCard-iOS.ipa",
+          "size": 4597510,
+          "localizedDescription": "## What's Changed in v1.3.1\n\n### 📲 Pairing File Import (iOS 18 – iOS 26 Support!)\n• **SideStore & LiveContainer Pairing File Support**: You can now import pairing files (`.mobiledevicepairing`, `.plist`, `.mobilepair`) directly from SideStore, LiveContainer, iLoader, AltStore, Jitterbug, or PC/Mac.\n• **No iOS 27 Required**: Users on iOS 18.0 through iOS 26 can now fully use AirCard-iOS by simply importing their pairing file from SideStore or LiveContainer.\n• **Safe Unpair / Reset**: Added a dedicated \"Delete Pairing / Unpair\" button to reset or switch pairing configurations without having to reinstall the app.\n• **In-App Pairing Guide**: Added a step-by-step setup guide sheet with exact paths to locate pairing files in the Files app (e.g. `SideStore/ALTPairingFile.mobiledevicepairing`).\n• **iOS 27+ Gated**: The \"Pair on Phone\" developer pairing block is now cleanly gated to iOS 27+, avoiding confusion on older iOS versions.\n\n### 💳 Apple Wallet & Card Customization\n• **Interactive Photo Cropper**: Added custom zoom, pan, and framing when selecting card artwork (PR #29).\n\n### 🔒 Passcode Themes (.passthm)\n• **UTF-8 Encoding Fix**: Fixed filename encoding in generated passcode theme ZIP archives to support non-ASCII characters and localization (PR #12).\n\n### 🖼 Wallpapers (.tendies)\n• **Restored Rock-Solid Wallpaper Engine**: Reverted experimental template tracking to restore proven v1.3 Tendies injection, auto-detection of PosterBoard containers, and instant WebKit NeoSpring resprings.\n\n### ❤️ Developer Support & Links\n• **Donate Tab in Credits**: Added direct donation options (PayPal, TON, USDT TRC-20, BEP-20) with one-tap copy and quick links to developer socials (@mak5er).\n• **Startup Welcome**: Clean notice highlighting developer credits and quick links.\n\n**Full Changelog**: https://github.com/Mak5er/AirCard-iOS/compare/v1.3...v1.3.1"
+        },
+        {
+          "version": "1.3",
+          "buildVersion": "v1.3",
+          "date": "2026-09-20T02:08:32Z",
+          "downloadURL": "https://github.com/Mak5er/AirCard-iOS/releases/download/v1.3/AirCard-iOS.ipa",
+          "size": 4452235,
+          "localizedDescription": "## What's Changed in v1.3\n\n> **Note**: AirCard-iOS currently supports **iOS 27.0 and newer (iOS 27+)**.\n\n### PosterBoard Wallpapers (.tendies)\n• Added support for importing and unpacking `.tendies` wallpaper archives.\n• Automatic PosterBoard container detection and active descriptor UUID preservation.\n• Integrated instant WebKit NeoSpring respring right after flashing (no device reboot required).\n\n### Apple Wallet & Passcode Theming\n• Added PDF artwork generation for transit passes (Suica, Pasmo, etc.).\n• Fixed keypad preview framing and TelephonyUI cache paths.\n• Cleaned up passcode number localization pickers.\n• Removed sluggish button glide animations when scanning cards and copying logs.\n\n### UI & Quality of Life\n• Centered action buttons and removed misplaced list divider lines across all tabs.\n• Removed disruptive import and install alert popups in favor of clean inline status logs.\n• Cleaned up the VPN status bar and removed redundant text labels.\n• General repository cleanup and project modernization.\n"
+        },
+        {
+          "version": "1.2.5",
+          "buildVersion": "v1.2.5",
+          "date": "2026-09-19T22:19:08Z",
+          "downloadURL": "https://github.com/Mak5er/AirCard-iOS/releases/download/v1.2.5/AirCard-iOS.ipa",
+          "size": 4180858,
+          "localizedDescription": "## What's Changed in v1.2.5\n\n### 🛡️ Crash & Memory Fixes\n- **Stack Overflow Crash Resolved:** Eliminated crashes on iOS 17/18 during TLS PSK and Tokio handshakes by delegating exploit and syslog routines to dedicated 4MB stack threads.\n- **Jetsam OOM Kill Prevention:** SwiftUI card grid now uses memory-efficient 512px thumbnails; full-resolution artwork is loaded on-demand during flash and immediately deallocated.\n\n### 🌐 Network & Tunnel Resilience\n- **LocalDevVPN & Loopback Routing:** Restored loopback priority (127.0.0.1, 10.7.0.1, 10.7.0.3) with adaptive 6s timeouts.\n- **Local Network Prompt:** Automatically verifies and requests Local Network permissions on launch.\n\n### ⚡ AirTraffic & PassKit Enhancements\n- **Airlock Directory Guarantee:** Automatically ensures `/var/mobile/Media/Airlock/Book` exists via AFC, preventing path traversal failures on devices without previous Apple Books syncs.\n- **Non-Fatal SyncFailed Handling:** Prevents premature sync terminations caused by delayed background session resets from `com.apple.atc`.\n- **Comprehensive Pass Artwork Suite:** Generates full 8-file skin variants (`cardBackgroundCombined`, `diffuse`, `background`, `strip` at @3x and @2x) in a single atomic batch write.\n- **Transit & Suica PDF Support:** Restored vector PDF generation (`cardBackgroundCombined.pdf`, `background.pdf`, `strip.pdf`) for complete support of transit and railway passes.\n- **Robust Card ID Sanitization:** Automatically cleans pasted paths, quotes, and `.pkpass` extensions to prevent invalid target paths."
+        }
+      ],
+      "screenshots": [],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "EnsWilde",
+      "bundleIdentifier": "com.yangjiii.EnsWilde",
+      "developerName": "YangJiiii",
+      "subtitle": "iOS customization tools for Wallet and passcode themes",
+      "localizedDescription": "An experimental on-device iOS customization app. Features and compatibility depend on the iOS version; back up your device before use.",
+      "iconURL": "https://raw.githubusercontent.com/YangJiiii/EnsWilde/main/MyApp_Dark_1024.png",
+      "tintColor": "#6750A4",
+      "category": "utilities",
+      "versions": [
+        {
+          "version": "EnsWilde3.1.3",
+          "buildVersion": "EnsWilde3.1.3",
+          "date": "2026-02-25T15:28:02Z",
+          "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1.3/EnsWilde.ipa",
+          "size": 13591314,
+          "localizedDescription": "# EnsWilde v3.1.3\r\n\r\n## Updates\r\n- You can now download DDI, fully resolving all DDI-related issues (updated via Settings)\r\n\r\n## Features\r\n- Added an option to hide the Dynamic Island in Theme UI  \r\n  *(A device restart is required for this feature to take effect)*\r\n- Added Feature Flags for in-app functionalities  \r\n  *(A device restart is required for this feature to take effect)*\r\n- zpatch Custom no longer requires a password\r\n\r\n## Guides\r\n- Updated the guide for obtaining default passcode files and Apple Wallet files  \r\n  *(You will need a Mac or a device that can receive AirDrop)*  \r\n  *(The guide is available in Settings)*"
+        },
+        {
+          "version": "EnsWilde3.1.2",
+          "buildVersion": "EnsWilde3.1.2",
+          "date": "2026-02-01T14:58:19Z",
+          "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1.2/EnsWilde.ipa",
+          "size": 13615407,
+          "localizedDescription": "# Fixes & Improvements\r\n\r\n## Bug Fixes\r\n- Fixed **StkJIT Code = -1** and **StkJIT Code = -60**\r\n- Fixed application **crash caused by outdated or invalid pairing files**\r\n  - A warning message is now shown instead of crashing when an old pairing file is detected\r\n\r\n## Testing & Verification\r\n- Tested and confirmed working on **LiveContainer**\r\n- Signed using a **personal certificate**\r\n\r\n---\r\nThank you for using and supporting the project.\r\n"
+        },
+        {
+          "version": "EnsWilde3.1.1",
+          "buildVersion": "EnsWilde3.1.1",
+          "date": "2026-01-22T11:37:58Z",
+          "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1.1/EnsWilde.ipa",
+          "size": 13564791,
+          "localizedDescription": "# Changelog\r\n\r\n## Bug Fixes\r\n- Fixed an issue where **rdar** was not working in **Mobile Gestalt**\r\n\r\n## New Features\r\n- Added a **Themes Store** to download passcode themes  \r\n  - You can also create your own custom theme  \r\n  - Contact me if you want your theme to be added\r\n\r\n## Language Support\r\n- Added **multi-language support**  \r\n  - If you want to contribute a new language, please contact me"
+        },
+        {
+          "version": "EnsWilde3.1",
+          "buildVersion": "EnsWilde3.1",
+          "date": "2026-01-19T15:53:10Z",
+          "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1/EnsWilde.ipa",
+          "size": 13311776,
+          "localizedDescription": "## ✅ Update Notes\r\n\r\n### Fixed\r\n- DDI issue has been resolved\r\n\r\n### Improvements\r\n- Added multi-language support\r\n\r\n### New Features\r\n- UI Theme option added  \r\n  - Allows disabling the Liquid Glass effect for a cleaner and smoother interface\r\n"
+        },
+        {
+          "version": "EnsWilde3.0",
+          "buildVersion": "EnsWilde3.0",
+          "date": "2026-01-18T07:14:23Z",
+          "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.0/EnsWilde.ipa",
+          "size": 12773718,
+          "localizedDescription": "- **No longer requires StikDebug:** You only need to enable LocalDevVPN for it to work.\r\n- **App improvements:** Enhanced application performance and stability."
+        }
+      ],
+      "screenshots": [],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    },
+    {
+      "name": "StikDebug",
+      "bundleIdentifier": "com.stik.stikdebug",
+      "developerName": "StikDebug",
+      "subtitle": "On-device JIT enabler and device toolbox.",
+      "localizedDescription": "An on-device debugger and developer toolbox for iOS versions 17.4+ powered by idevice.  Note: Requires LocalDevVPN, cannot be natively used inside LiveContainer to enable JIT for the same LiveContainer.",
+      "iconURL": "https://github.com/StikDebug/StikDebug/blob/main/assets/StikDebug.png?raw=true",
+      "tintColor": "#3B86F7",
+      "size": 11996559,
+      "screenshots": [
+        {
+          "imageURL": "https://stikdebug.xyz/assets/source/home.png"
+        },
+        {
+          "imageURL": "https://stikdebug.xyz/assets/source/scripts.png"
+        },
+        {
+          "imageURL": "https://stikdebug.xyz/assets/source/settings.png"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSLocalNetworkUsageDescription": "StikDebug needs access to devices on your local network so it can connect to the ip of the target device.",
+          "NSLocationAlwaysAndWhenInUseUsageDescription": "StikDebug uses location to stay running in the background and maintain your connection. This can be turned off in settings.",
+          "NSLocationWhenInUseUsageDescription": "StikDebug uses location to stay running in the background and maintain your connection. This can be turned off in settings."
+        }
+      },
+      "versions": [
+        {
+          "version": "3.1.14",
+          "date": "2026-10-12",
+          "localizedDescription": "Add Husk support\n\nFull Changelog: https://github.com/StikDebug/StikDebug/compare/3.1.13...3.1.14",
+          "downloadURL": "https://github.com/StikDebug/StikDebug/releases/download/3.1.14/StikDebug-3.1.14.ipa",
+          "size": 13544340,
+          "minOSVersion": "17.4"
+        }
+      ],
+      "category": "other"
     }
   ],
   "news": [

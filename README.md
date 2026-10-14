@@ -11,8 +11,8 @@ https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
 <!-- AUTO-UPDATE-APPS:START -->
 ## Apps 更新狀態
 
-- **最近自動檢查：** 2026-10-14 19:40:59（台灣時間）
-- **最近內容更新：** 尚未更新（台灣時間）
+- **最近自動檢查：** 2026-10-14 20:03:50（台灣時間）
+- **最近內容更新：** 2026-10-14 20:03:50（台灣時間）
 
 | App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
 | --- | --- | --- | --- | --- | --- |
@@ -20,11 +20,15 @@ https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
 | **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | Unchanged | 6.3.0 | 2026-10-13T06:34:15.000Z | 2026-10-13T06:34:15.000Z |
 | **[Kazumi](https://github.com/ChouChiu/Kazumi-AltStore-Source)** | Predidit | Unchanged | 2.3.8 | 2026-10-07T03:41:05.000Z | 2026-10-07T03:41:05.000Z |
 | **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Unchanged | 0.9 | 2026-09-03 | 2026-09-03 |
+| **[Photos Backup](https://github.com/g8row/PhotosBackup)** | g8row | **Updated** | 0.3.7 | 2026-09-20T16:10:16Z | **2026-10-14 20:03:50** |
+| **[AirCard-iOS](https://github.com/Mak5er/AirCard-iOS)** | Mak5er | **Updated** | 1.3.2 | 2026-10-04T12:22:53Z | **2026-10-14 20:03:50** |
+| **[EnsWilde](https://github.com/YangJiiii/EnsWilde)** | YangJiiii | **Updated** | EnsWilde3.1.3 | 2026-02-25T15:28:02Z | **2026-10-14 20:03:50** |
+| **[StikDebug](https://github.com/StephenDev0/StikDebug)** | StephenDev0 | **Updated** | 3.1.14 | 2026-10-12 | **2026-10-14 20:03:50** |
 
 <!-- AUTO-UPDATE-APPS:END -->
 
 <!-- AUTO-UPDATE-STATUS-TIMES:START -->
-<!-- {} -->
+<!-- {"AirCard-iOS": "2026-10-14 20:03:50", "EnsWilde": "2026-10-14 20:03:50", "Photos Backup": "2026-10-14 20:03:50", "StikDebug": "2026-10-14 20:03:50"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
 ## 開發
