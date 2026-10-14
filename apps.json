@@ -339,7 +339,7 @@
           "size": 35355797
         }
       ],
-      "subtitle": "Animeko"
+      "subtitle": "集找番、追番、看番的一站式弹幕追番平台，云收藏同步 (Bangumi)，离线缓存，BitTorrent，弹幕云过滤。"
     },
     {
       "name": "Kazumi",
@@ -1275,13 +1275,13 @@
           "minOSVersion": "13.0"
         }
       ],
-      "subtitle": "Kazumi"
+      "subtitle": "使用 Flutter 开发的基于自定义规则的番剧采集与在线观看程序。"
     },
     {
       "name": "Aidoku",
       "bundleIdentifier": "app.aidoku.Aidoku",
       "developerName": "Skitty",
-      "subtitle": "Free and open source manga reader for iOS and iPadOS",
+      "subtitle": "A free and open source manga reading application for iOS, iPadOS, and macOS.",
       "localizedDescription": "A free and open source manga reading application for iOS and iPadOS.",
       "iconURL": "https://aidoku.app/images/apple-touch-icon.png",
       "tintColor": "ff375f",
@@ -1341,7 +1341,7 @@
           "minOSVersion": "15.0"
         }
       ],
-      "subtitle": "Photos Backup",
+      "subtitle": "An experimental, fully on-device iPhone app for backing up selected photos, videos, and albums to Google Photos.",
       "tintColor": "#777777",
       "category": "other",
       "screenshots": [],
@@ -1354,7 +1354,7 @@
       "name": "AirCard-iOS",
       "bundleIdentifier": "com.mak5er.aircard",
       "developerName": "Mak5er",
-      "subtitle": "Apple Wallet card skins, passcode themes, and wallpapers",
+      "subtitle": "Apple Wallet card skins, lock screen passcode themes, and PosterBoard wallpapers directly on iOS.",
       "localizedDescription": "Customize Apple Wallet card artwork, passcode themes, and PosterBoard wallpapers on supported iOS versions.",
       "iconURL": "https://raw.githubusercontent.com/Mak5er/AirCard-iOS/main/ios-app/Assets.xcassets/AppIcon.appiconset/AppIcon.png",
       "tintColor": "#6750A4",
@@ -1403,7 +1403,7 @@
       "name": "EnsWilde",
       "bundleIdentifier": "com.yangjiii.EnsWilde",
       "developerName": "YangJiiii",
-      "subtitle": "iOS customization tools for Wallet and passcode themes",
+      "subtitle": "A tool utilizing itunesstored and bookassetd exploits for on-device iOS customization.",
       "localizedDescription": "An experimental on-device iOS customization app. Features and compatibility depend on the iOS version; back up your device before use.",
       "iconURL": "https://raw.githubusercontent.com/YangJiiii/EnsWilde/main/MyApp_Dark_1024.png",
       "tintColor": "#6750A4",
