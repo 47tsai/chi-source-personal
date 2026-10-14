@@ -1,6 +1,9 @@
 name: Auto Update Chi Source Personal
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
