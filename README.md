@@ -22,7 +22,7 @@ https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
 | **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Unchanged | 0.9 | 2026-09-03 | 2026-09-03 |
 | **[Photos Backup](https://github.com/g8row/PhotosBackup)** | g8row | **Updated** | 0.3.7 | 2026-09-20 | **2026-10-14** |
 | **[AirCard-iOS](https://github.com/Mak5er/AirCard-iOS)** | Mak5er | **Updated** | 1.3.2 | 2026-10-04 | **2026-10-14** |
-| **[EnsWilde](https://github.com/YangJiiii/EnsWilde)** | YangJiiii | **Updated** | EnsWilde3.1.3 | 2026-02-25 | **2026-10-14** |
+| **[EnsWilde](https://github.com/YangJiiii/EnsWilde)** | YangJiiii | **Updated** | 3.1.3 | 2026-02-25 | **2026-10-14** |
 | **[StikDebug](https://github.com/StephenDev0/StikDebug)** | StephenDev0 | **Updated** | 3.1.14 | 2026-10-12 | **2026-10-14** |
 
 <!-- AUTO-UPDATE-APPS:END -->
