@@ -10,13 +10,13 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 ROOT = Path(__file__).resolve().parent
-SOURCES_FILE = ROOT / "sources.json"
+SOURCES_FILE = ROOT / "app_config.json"
 OUTPUT_FILE = ROOT / "apps.json"
 SOURCE_NAME = "Chi Source Personal"
 SOURCE_IDENTIFIER = "com.tsai97216.chisourcepersonal"
 SOURCE_URL = "https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json"
 SOURCE_WEBSITE = "https://github.com/tsai97216/chi-source-personal"
-SOURCE_ICON = "https://raw.githubusercontent.com/tsai97216/chi-source/main/source_icon.png"
+SOURCE_ICON = "https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/source_icon.png"
 VALID_CATEGORIES = {
     "developer", "entertainment", "games", "lifestyle",
     "other", "photo-video", "social", "utilities",
