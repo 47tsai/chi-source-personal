@@ -1,525 +1,282 @@
-import argparse
 import json
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo
-from packaging import version as pkg_version
+from urllib.parse import urlparse
+
 import requests
-from providers import GitHubProvider, JsonSourceProvider
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-FILENAME = "apps.json"
-README_FILENAME = "README.md"
-YOUR_GITHUB_ID = "tsai97216"
-DISPLAY_NAME = "Chi Source"
-SOURCE_URL = "https://ipa.chi.qzz.io"
-SOURCE_ICON_URL = f"https://raw.githubusercontent.com/{YOUR_GITHUB_ID}/chi-source/main/source_icon.png"
-SOURCE_DESCRIPTION = "iOS IPA Source"
+ROOT = Path(__file__).resolve().parent
+SOURCES_FILE = ROOT / "sources.json"
+OUTPUT_FILE = ROOT / "apps.json"
+SOURCE_NAME = "Chi Source Personal"
+SOURCE_IDENTIFIER = "com.tsai97216.chisourcepersonal"
+SOURCE_URL = "https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json"
+SOURCE_WEBSITE = "https://github.com/tsai97216/chi-source-personal"
+SOURCE_ICON = "https://raw.githubusercontent.com/tsai97216/chi-source/main/source_icon.png"
+VALID_CATEGORIES = {
+    "developer", "entertainment", "games", "lifestyle",
+    "other", "photo-video", "social", "utilities",
+}
+HEX_COLOR = re.compile(r"^#?[0-9a-fA-F]{6}$")
 
 
 def create_session():
-    retry = Retry(total=3, connect=3, read=3, status=3, backoff_factor=1, status_forcelist=(429, 500, 502, 503, 504), allowed_methods=frozenset({"GET", "HEAD"}), respect_retry_after_header=True)
-    adapter = HTTPAdapter(max_retries=retry)
+    retry = Retry(
+        total=3,
+        connect=3,
+        read=3,
+        status=3,
+        backoff_factor=1,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=frozenset({"GET"}),
+        respect_retry_after_header=True,
+    )
     session = requests.Session()
-    session.mount("https://", adapter)
-    session.headers.update({"User-Agent": "Chi-Source-Updater/1.0", "Accept": "application/json"})
+    session.mount("https://", HTTPAdapter(max_retries=retry))
+    session.headers.update({
+        "User-Agent": "Chi-Source-Personal-Updater/1.0",
+        "Accept": "application/json",
+    })
     return session
 
-SESSION = create_session()
-GITHUB_PROVIDER = GitHubProvider(SESSION)
-JSON_PROVIDER = JsonSourceProvider(lambda url: fetch_json(url))
 
-
-def fetch_json(url):
+def is_https_url(value):
+    if not isinstance(value, str):
+        return False
     try:
-        response = SESSION.get(url, timeout=15)
+        parsed = urlparse(value)
+        return parsed.scheme == "https" and bool(parsed.netloc)
+    except ValueError:
+        return False
+
+
+def collect_screenshot_urls(value):
+    """Normalize AltStore screenshot formats into a list of HTTPS image URLs."""
+    found = []
+
+    def visit(item):
+        if isinstance(item, str):
+            if is_https_url(item):
+                found.append(item)
+        elif isinstance(item, list):
+            for child in item:
+                visit(child)
+        elif isinstance(item, dict):
+            if isinstance(item.get("imageURL"), str):
+                visit(item["imageURL"])
+            else:
+                for key in ("iphone", "ipad", "images", "screenshots"):
+                    if key in item:
+                        visit(item[key])
+
+    visit(value)
+    return list(dict.fromkeys(found))
+
+
+def normalize_version(raw, app_name):
+    if not isinstance(raw, dict):
+        raise ValueError(f"{app_name}: version entry is not an object")
+
+    version = raw.get("version")
+    date = raw.get("date")
+    download_url = raw.get("downloadURL")
+    size = raw.get("size")
+
+    if not isinstance(version, str) or not version.strip():
+        raise ValueError(f"{app_name}: version has no version string")
+    if not isinstance(date, str) or not date.strip():
+        raise ValueError(f"{app_name} {version}: version has no date")
+    try:
+        datetime.fromisoformat(date.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{app_name} {version}: invalid date {date!r}") from exc
+    if not is_https_url(download_url):
+        raise ValueError(f"{app_name} {version}: invalid downloadURL")
+    if not download_url.lower().split("?", 1)[0].endswith(".ipa"):
+        raise ValueError(f"{app_name} {version}: downloadURL is not an IPA")
+    if isinstance(size, str) and size.isdigit():
+        size = int(size)
+    if type(size) is not int or size <= 0:
+        raise ValueError(f"{app_name} {version}: invalid IPA size")
+
+    normalized = dict(raw)
+    normalized["version"] = version.strip()
+    normalized["date"] = date
+    normalized["downloadURL"] = download_url
+    normalized["size"] = size
+    description = normalized.get("localizedDescription", "")
+    normalized["localizedDescription"] = description if isinstance(description, str) else str(description)
+    return normalized
+
+
+def normalize_app(raw, source_name):
+    if not isinstance(raw, dict):
+        raise ValueError(f"{source_name}: app entry is not an object")
+
+    name = raw.get("name")
+    bundle_id = raw.get("bundleIdentifier")
+    icon_url = raw.get("iconURL")
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError(f"{source_name}: app has no name")
+    if not isinstance(bundle_id, str) or not bundle_id.strip():
+        raise ValueError(f"{source_name} / {name}: app has no bundleIdentifier")
+    if not is_https_url(icon_url):
+        raise ValueError(f"{source_name} / {name}: invalid iconURL")
+
+    raw_versions = raw.get("versions")
+    if not isinstance(raw_versions, list) or not raw_versions:
+        raise ValueError(f"{source_name} / {name}: no versions")
+    versions = [normalize_version(item, name) for item in raw_versions]
+
+    tint = raw.get("tintColor", "#777777")
+    if not isinstance(tint, str) or not HEX_COLOR.fullmatch(tint):
+        tint = "#777777"
+
+    category = raw.get("category", "other")
+    if category not in VALID_CATEGORIES:
+        category = "other"
+
+    screenshots = [
+        {"imageURL": url}
+        for url in collect_screenshot_urls(raw.get("screenshots", []))
+    ]
+
+    permissions = raw.get("appPermissions")
+    if not isinstance(permissions, dict):
+        permissions = {}
+    entitlements = permissions.get("entitlements", [])
+    privacy = permissions.get("privacy", {})
+    if not isinstance(entitlements, list):
+        entitlements = []
+    if not isinstance(privacy, dict):
+        privacy = {}
+
+    app = dict(raw)
+    app.update({
+        "name": name.strip(),
+        "bundleIdentifier": bundle_id.strip(),
+        "developerName": raw.get("developerName") or source_name,
+        "subtitle": raw.get("subtitle") or name.strip(),
+        "localizedDescription": raw.get("localizedDescription") or "",
+        "iconURL": icon_url,
+        "tintColor": tint,
+        "category": category,
+        "screenshots": screenshots,
+        "appPermissions": {
+            **permissions,
+            "entitlements": entitlements,
+            "privacy": privacy,
+        },
+        "versions": versions,
+    })
+    return app
+
+
+def merge_catalogs(catalogs):
+    """Merge (source_name, source_json) pairs; the first bundle ID wins."""
+    apps = []
+    seen_bundle_ids = set()
+    news = []
+    seen_news = set()
+
+    for source_name, catalog in catalogs:
+        if not isinstance(catalog, dict) or not isinstance(catalog.get("apps"), list):
+            raise ValueError(f"{source_name}: source JSON has no apps array")
+
+        for raw_app in catalog["apps"]:
+            app = normalize_app(raw_app, source_name)
+            bundle_id = app["bundleIdentifier"]
+            if bundle_id in seen_bundle_ids:
+                print(f"⚠️ Duplicate bundle ID skipped: {app['name']} ({bundle_id})")
+                continue
+            seen_bundle_ids.add(bundle_id)
+            apps.append(app)
+
+        raw_news = catalog.get("news", [])
+        if isinstance(raw_news, list):
+            for item in raw_news:
+                if not isinstance(item, dict):
+                    continue
+                app_id = item.get("appID")
+                if app_id and app_id not in seen_bundle_ids:
+                    continue
+                key = (
+                    item.get("identifier"),
+                    item.get("title"),
+                    item.get("date"),
+                    app_id,
+                )
+                if key not in seen_news:
+                    seen_news.add(key)
+                    news.append(item)
+
+    if not apps:
+        raise ValueError("No apps were collected from the configured sources")
+
+    return apps, news
+
+
+def build_source(catalogs):
+    apps, news = merge_catalogs(catalogs)
+    return {
+        "name": SOURCE_NAME,
+        "identifier": SOURCE_IDENTIFIER,
+        "sourceURL": SOURCE_URL,
+        "subtitle": "個人精選的 ACG、小眾 App 與興趣工具",
+        "description": (
+            "Chi Source Personal 是個人興趣向的 AltStore / SideStore Source。"
+            "App 資訊與版本由各專案的公開來源同步，請留意各 App 的使用條款與權限。"
+        ),
+        "website": SOURCE_WEBSITE,
+        "iconURL": SOURCE_ICON,
+        "featuredApps": [app["bundleIdentifier"] for app in apps],
+        "apps": apps,
+        "news": news,
+    }
+
+
+def load_catalogs(session, sources):
+    catalogs = []
+    for source in sources:
+        name = source.get("name")
+        url = source.get("url")
+        if not isinstance(name, str) or not name.strip() or not is_https_url(url):
+            raise ValueError(f"Invalid source configuration: {source!r}")
+        print(f"⬇️ Fetching {name}: {url}")
+        response = session.get(url, timeout=25)
         response.raise_for_status()
-        return response.json()
-    except (requests.RequestException, ValueError) as exc:
-        print(f"⚠️ fetch failed: {url} -> {exc}")
-        return None
-
-
-def validate_download_url(url, expected_size=0):
-    if not isinstance(url, str) or not url.startswith("https://"):
-        return False
-    try:
-        response = SESSION.head(url, allow_redirects=True, timeout=15)
-        if response.status_code in (405, 501):
-            response.close()
-            response = SESSION.get(url, headers={"Range": "bytes=0-0"}, allow_redirects=True, timeout=15, stream=True)
-        ok = response.status_code in (200, 206)
-        content_length = response.headers.get("Content-Length")
-        if ok:
-            if not content_length:
-                ok = False
-            else:
-                ok = int(content_length) > 0 and (not expected_size or int(content_length) == int(expected_size))
-        response.close()
-        return ok
-    except (requests.RequestException, ValueError):
-        return False
-
-
-def ensure_list(data, key=None):
-    if isinstance(data, list): return data
-    if isinstance(data, dict):
-        value = data.get(key, []) if key else []
-        return value if isinstance(value, list) else []
-    return []
-
-
-APP_CONFIG_FILENAME = "app_config.json"
-
-def load_app_config():
-    path = Path(APP_CONFIG_FILENAME)
-    data = json.loads(path.read_text(encoding="utf-8"))
-    apps = data.get("apps") if isinstance(data, dict) else None
-    if not isinstance(apps, list) or not all(isinstance(app, dict) for app in apps):
-        raise ValueError(f"{APP_CONFIG_FILENAME}: apps must be a list of objects")
-    return apps
-
-GITHUB_APPS = load_app_config()
-SOURCE_DATA_URL = "https://raw.githubusercontent.com/apptesters-org/AppTesters_Repo/main/apps.json"
-APPT_ESTERS_REPO_URL = "https://github.com/apptesters-org/AppTesters_Repo"
-IPA_VAULT_SOURCE_URL = "https://raw.githubusercontent.com/927tx/IPA-Vault/refs/heads/main/ipavaultsource.json"
-IPA_VAULT_REPO_URL = "https://github.com/927tx/IPA-Vault"
-IPA_VAULT_APPS = {
-    "Facebook": {"name": "Facebook (iQFace)", "bundleIdentifier": "com.facebook.Facebook"},
-    "Threads": {"name": "Threads (ThreadSaver)", "bundleIdentifier": "com.burbn.barcelona"},
-}
-SIDeloadLABS_SOURCE_URL = "https://raw.githubusercontent.com/SideloadLabs/SideloasLabs-AltSource/main/apps.json"
-SIDELOADLABS_REPO_URL = "https://github.com/SideloadLabs/SideloasLabs-AltSource"
-TARGET_APPS = ["Facebook", "Threads", "Instagram"]
-SIDELOADLABS_APP = "EeveeSpotifyReincarnated(PATCHED)"
-SIDELOADLABS_DISPLAY_NAME = "EeveeSpotify Reincarnated"
-APP_STYLE = {
-    "Facebook": {"color": "78A5E3", "subtitle": "IPA Vault"},
-    "Threads": {"color": "858585", "subtitle": "IPA Vault"},
-    "Instagram": {"color": "DC8FA1", "subtitle": "AppTesters"},
-    "EeveeSpotify Reincarnated": {"color": "669878", "subtitle": "SideloadLabs"},
-}
-APP_TABLE_START = "<!-- AUTO-UPDATE-APPS:START -->"
-APP_TABLE_END = "<!-- AUTO-UPDATE-APPS:END -->"
-STATUS_START = "<!-- AUTO-UPDATE-STATUS:START -->"
-STATUS_END = "<!-- AUTO-UPDATE-STATUS:END -->"
-STATUS_TIMES_START = "<!-- AUTO-UPDATE-STATUS-TIMES:START -->"
-STATUS_TIMES_END = "<!-- AUTO-UPDATE-STATUS-TIMES:END -->"
-
-
-def fetch_remote():
-    data = JSON_PROVIDER.fetch(SOURCE_DATA_URL)
-    return None if data is None else ensure_list(data, "apps")
-
-
-def get_version(app):
-    if not isinstance(app, dict): return "0.0.0"
-    if app.get("version"): return str(app["version"])
-    versions = app.get("versions") or []
-    return str(versions[0].get("version", "0.0.0")) if versions and isinstance(versions[0], dict) else "0.0.0"
-
-
-def normalize_version(name, text):
-    text = str(text)
-    if name == "MaxMusic":
-        match = re.search(r"\band\s+(\d+\.\d+\.\d+)(?!\d)", text, re.IGNORECASE)
-        return match.group(1) if match else text
-    if name == "YTKACE":
-        match = re.search(r"(?:youtube|yt)\s*[vV]?\s*(\d+\.\d+\.\d+)(?!\d)", text, re.IGNORECASE)
-        return match.group(1) if match else text
-    return text
-
-
-def keep_latest_only(apps):
-    latest = {}
-    for app in apps:
-        if not isinstance(app, dict) or not app.get("bundleIdentifier"): continue
-        bid, ver = app["bundleIdentifier"], get_version(app)
-        if bid not in latest:
-            latest[bid] = app
-        else:
-            try:
-                if pkg_version.parse(ver) > pkg_version.parse(get_version(latest[bid])): latest[bid] = app
-            except Exception: latest[bid] = app
-    return list(latest.values())
-
-
-def choose_ipa_asset(assets, app):
-    candidates = [a for a in assets if isinstance(a, dict) and str(a.get("name", "")).lower().endswith(".ipa")]
-    if app.get("name") == "MaxMusic":
-        preferred = [a for a in candidates if "no_ymp" not in str(a.get("name", "")).lower() and "no-ymp" not in str(a.get("name", "")).lower()]
-        if preferred: candidates = preferred
-    if not candidates: return None
-    keywords = [str(k).lower() for k in app.get("asset_keywords", [])]
-    def score(asset):
-        name = str(asset.get("name", "")).lower()
-        return (max((len(k) for k in keywords if k in name), default=0), asset.get("created_at") or "", name)
-    return max(candidates, key=score)
-
-
-def choose_highest_ytkace_ipa(releases):
-    candidates = []
-    for release in releases:
-        if not isinstance(release, dict) or release.get("draft") or release.get("prerelease"):
-            continue
-        for asset in release.get("assets", []):
-            if not isinstance(asset, dict):
-                continue
-            name = str(asset.get("name", ""))
-            if not name.lower().endswith(".ipa"):
-                continue
-            match = re.search(r"(?:youtube|yt)[_\s-]*[vV]?[_\s-]*(\d+\.\d+\.\d+)", name, re.IGNORECASE)
-            if not match:
-                continue
-            candidates.append((pkg_version.parse(match.group(1)), release, asset))
-    if not candidates:
-        print("⚠️ YTKACE: no IPA with a YouTube version found")
-        return None
-    candidates.sort(key=lambda x: (x[0], x[1].get("published_at") or x[1].get("created_at") or ""), reverse=True)
-    for v, release, asset in candidates:
-        print(f"🔎 YTKACE candidate: YouTube {v} -> {asset.get('name')} ({release.get('name') or release.get('tag_name')})")
-    v, release, asset = candidates[0]
-    print(f"✅ YTKACE selected: YouTube {v} -> {asset.get('name')}")
-    return release, asset
-
-
-def get_latest_special_release(app, releases=None):
-    try:
-        if releases is None:
-            releases = GITHUB_PROVIDER.releases(app["repo"], per_page=30)
-        candidates = []
-        for release in releases if isinstance(releases, list) else []:
-            if not isinstance(release, dict) or release.get("draft") or release.get("prerelease"): continue
-            name = str(release.get("name") or "")
-            lower = name.lower()
-            if app["name"] == "MaxMusic":
-                if not any(marker in lower for marker in ("ytmultimate+", "ytmusicultimate+")) or "no-ymp" in lower or "no_ymp" in lower: continue
-                if not re.search(r"\band\s+\d+\.\d+\.\d+\b", name, re.IGNORECASE): continue
-            elif app["name"] == "YTKACE":
-                if "ytkace" not in lower: continue
-            candidates.append(release)
-        if not candidates: return None
-        candidates.sort(key=lambda r: r.get("published_at") or r.get("created_at") or "", reverse=True)
-        return candidates[0]
-    except (requests.RequestException, ValueError):
-        return None
-
-
-def format_subtitle(author, date):
-    return f"{author}（{date}）" if date else author
-
-
-def format_app_subtitle(author, version_date):
-    return format_subtitle(author, version_date)
-
-
-def build_from_github(app):
-    try:
-        special = app.get("name") in {"MaxMusic", "YTKACE"}
-        releases = GITHUB_PROVIDER.releases(app["repo"], per_page=100) if special else None
-        data = get_latest_special_release(app, releases) if special else GITHUB_PROVIDER.latest_release(app["repo"])
-        if not data: return None
-        if app.get("name") == "YTKACE":
-            selected = choose_highest_ytkace_ipa(releases or [])
-            if not selected: return None
-            data, ipa = selected
-            version_match = re.search(r"(?:youtube|yt)[_\s-]*[vV]?[_\s-]*(\d+\.\d+\.\d+)", str(ipa.get("name", "")), re.IGNORECASE)
-            version_name = version_match.group(1) if version_match else ""
-        else:
-            ipa = choose_ipa_asset(data.get("assets", []), app)
-            if not ipa: return None
-            raw_version = data.get("name") or data.get("tag_name") or ""
-            version_name = normalize_version(app["name"], raw_version.lstrip("v"))
-        download_url, size = ipa.get("browser_download_url"), ipa.get("size", 0)
-        if not version_name or not download_url or not validate_download_url(download_url, size): return None
-        version_date = (data.get("published_at") or data.get("created_at") or "")[:10]
-        return {"name": app["name"], "bundleIdentifier": app["bundleID"], "developerName": app["author"], "subtitle": format_app_subtitle(app["subtitle"], version_date), "localizedDescription": app["desc"], "iconURL": app["icon"], "tintColor": app["color"], "category": app.get("category", "entertainment"), "screenshots": [], "versions": [{"version": version_name, "date": version_date, "localizedDescription": (data.get("body") or "")[:500], "downloadURL": download_url, "size": size}]}
-    except (requests.RequestException, ValueError):
-        return None
-
-
-def build_from_sideloadlabs(apps):
-    if not isinstance(apps, list): return None
-    match = next((app for app in apps if isinstance(app, dict) and app.get("name") == SIDELOADLABS_APP), None)
-    if not isinstance(match, dict): return None
-    url, size = match.get("downloadURL"), match.get("size", 0)
-    if not match.get("bundleIdentifier") or not url or not validate_download_url(url, size): return None
-    return {
-        "name": SIDELOADLABS_DISPLAY_NAME,
-        "bundleIdentifier": match["bundleIdentifier"],
-        "developerName": match.get("developerName", "SideloadLabs"),
-        "subtitle": format_app_subtitle("SideloadLabs", match.get("versionDate", "")),
-        "localizedDescription": match.get("localizedDescription", ""),
-        "iconURL": match.get("iconURL"),
-        "tintColor": "669878",
-        "category": "entertainment",
-        "screenshots": [],
-        "versions": [{
-            "version": match.get("version", ""),
-            "date": match.get("versionDate", ""),
-            "localizedDescription": match.get("versionDescription") or match.get("localizedDescription", ""),
-            "downloadURL": url,
-            "size": size,
-        }],
-    }
-
-
-def build_from_apptesters(app):
-    if not isinstance(app, dict): return None
-    name = app.get("name"); style = APP_STYLE.get(name, {"color": None, "subtitle": "AppTesters"})
-    url, size = app.get("downloadURL"), app.get("size", 0)
-    if not app.get("bundleIdentifier") or not url or not validate_download_url(url, size): return None
-    return {"name": name, "bundleIdentifier": app["bundleIdentifier"], "developerName": "AppTesters", "subtitle": format_app_subtitle(style["subtitle"], app.get("versionDate", "")), "localizedDescription": app.get("localizedDescription", ""), "iconURL": app.get("iconURL") or app.get("icon"), "tintColor": style["color"], "category": "social" if name in {"Facebook", "Threads", "Instagram"} else "entertainment", "screenshots": [], "versions": [{"version": app.get("version", ""), "date": app.get("versionDate", ""), "localizedDescription": app.get("localizedDescription", ""), "downloadURL": url, "size": size}]}
-
-
-def build_from_ipavault(apps, target_name):
-    config = IPA_VAULT_APPS.get(target_name)
-    if not config or not isinstance(apps, list):
-        return None
-    match = next((item for item in apps if isinstance(item, dict) and item.get("name") == config["name"]), None)
-    if not isinstance(match, dict) or match.get("bundleIdentifier") != config["bundleIdentifier"]:
-        return None
-    url, size = match.get("downloadURL"), match.get("size", 0)
-    version = match.get("version")
-    version_date = match.get("versionDate", "")
-    if not version or not version_date or not url or not validate_download_url(url, size):
-        return None
-    style = APP_STYLE[target_name]
-    return {
-        "name": target_name,
-        "bundleIdentifier": config["bundleIdentifier"],
-        "developerName": "IPA Vault",
-        "subtitle": format_app_subtitle("IPA Vault", version_date),
-        "localizedDescription": match.get("localizedDescription", ""),
-        "iconURL": match.get("iconURL"),
-        "tintColor": style["color"],
-        "category": "social",
-        "screenshots": [],
-        "versions": [{
-            "version": str(version),
-            "date": version_date,
-            "localizedDescription": match.get("versionDescription") or match.get("localizedDescription", ""),
-            "downloadURL": url,
-            "size": size,
-        }],
-    }
-
-
-def find_previous_app(old_apps, bundle_id=None, name=None):
-    if not isinstance(old_apps, dict): return None
-    for app in old_apps.get("apps", []):
-        if isinstance(app, dict) and ((bundle_id and app.get("bundleIdentifier") == bundle_id) or (name and app.get("name") == name)): return app
-    return None
-
-
-def now_taiwan(): return datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d %H:%M:%S")
-
-
-def get_previous_content_update(readme):
-    match = re.search(r"最近內容更新：\s*\*?\*?\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", readme)
-    return match.group(1) if match else "尚未更新"
-
-
-def get_status_updated_at(readme):
-    match = re.search(re.escape(STATUS_TIMES_START) + r"\s*<!--\s*(\{.*?\})\s*-->\s*" + re.escape(STATUS_TIMES_END), readme, flags=re.DOTALL)
-    if not match:
-        return {}
-    try:
-        data = json.loads(match.group(1))
-        return data if isinstance(data, dict) else {}
-    except json.JSONDecodeError:
-        return {}
-
-
-def is_updated_within_day(updated_at, checked_at):
-    try:
-        updated = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
-        checked = datetime.strptime(checked_at, "%Y-%m-%d %H:%M:%S")
-        elapsed = (checked - updated).total_seconds()
-        return 0 <= elapsed < 86400
-    except (TypeError, ValueError):
-        return False
-
-
-def get_app_meta(name):
-    for app in GITHUB_APPS:
-        if app["name"] == name: return app["author"], app["repo_url"]
-    if name == SIDELOADLABS_DISPLAY_NAME: return "SideloadLabs", SIDELOADLABS_REPO_URL
-    if name in IPA_VAULT_APPS: return "IPA Vault", IPA_VAULT_REPO_URL
-    return ("AppTesters", APPT_ESTERS_REPO_URL) if name in TARGET_APPS else ("Unknown", "")
-
-
-def format_app_update_time(app, status_times, checked_at):
-    name = app.get("name", "Unknown")
-    exact_time = status_times.get(name)
-    if exact_time and is_updated_within_day(exact_time, checked_at):
-        return f"**{exact_time}**"
-    date = ((app.get("versions") or [{}])[0]).get("date", "N/A")
-    return date or "N/A"
-
-
-def update_readme(apps, checked_at, content_updated_at, statuses, status_times):
-    path = Path(README_FILENAME)
-    readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source\n"
-    rows = ["| App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |", "| --- | --- | --- | --- | --- | --- |"]
-    for app in apps:
-        name = app.get("name", "Unknown")
-        author, url = get_app_meta(name)
-        app_link = f"[{name}]({url})" if url else name
-        latest = (app.get("versions") or [{}])[0]
-        status = statuses.get(name, "Unchanged")
-        if status == "Updated":
-            status = "**Updated**"
-        rows.append(f"| **{app_link}** | {author} | {status} | {latest.get('version', 'N/A')} | {latest.get('date', 'N/A')} | {format_app_update_time(app, status_times, checked_at)} |")
-    app_table = "\n".join([
-        APP_TABLE_START,
-        "## Apps 更新狀態",
-        "",
-        f"- **最近自動檢查：** {checked_at}（台灣時間）",
-        f"- **最近內容更新：** {content_updated_at}（台灣時間）",
-        "",
-        *rows,
-        "",
-        APP_TABLE_END,
-    ])
-    if APP_TABLE_START in readme and APP_TABLE_END in readme:
-        left = readme.index(APP_TABLE_START)
-        right = readme.index(APP_TABLE_END, left) + len(APP_TABLE_END)
-        readme = readme[:left] + app_table + readme[right:]
-    else:
-        readme = readme.rstrip() + "\n\n" + app_table + "\n"
-    if STATUS_START in readme and STATUS_END in readme:
-        left = readme.index(STATUS_START)
-        right = readme.index(STATUS_END, left) + len(STATUS_END)
-        readme = readme[:left] + readme[right:]
-    status_times_block = "\n".join([
-        STATUS_TIMES_START,
-        f"<!-- {json.dumps(status_times, ensure_ascii=False, sort_keys=True)} -->",
-        STATUS_TIMES_END,
-    ])
-    if STATUS_TIMES_START in readme and STATUS_TIMES_END in readme:
-        left = readme.index(STATUS_TIMES_START)
-        right = readme.index(STATUS_TIMES_END, left) + len(STATUS_TIMES_END)
-        readme = readme[:left] + status_times_block + readme[right:]
-    else:
-        readme = readme.rstrip() + "\n" + status_times_block + "\n"
-    path.write_text(readme, encoding="utf-8")
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Update Chi Source")
-    parser.add_argument("--app", help="Only update the specified app. Omit to update all apps.")
-    return parser.parse_args()
-
-
-def build_single_app(target_name, old_apps):
-    config = next((app for app in GITHUB_APPS if app.get("name") == target_name), None)
-    if config:
-        built = build_from_github(config)
-        if built: return built
-        return find_previous_app({"apps": old_apps}, bundle_id=config["bundleID"])
-
-    if target_name in IPA_VAULT_APPS:
-        source = JSON_PROVIDER.fetch(IPA_VAULT_SOURCE_URL)
-        built = build_from_ipavault(ensure_list(source, "apps"), target_name)
-        return built or find_previous_app({"apps": old_apps}, name=target_name)
-
-    if target_name in TARGET_APPS:
-        remote_apps = fetch_remote()
-        match = next((app for app in remote_apps or [] if isinstance(app, dict) and app.get("name") == target_name), None)
-        built = build_from_apptesters(match) if match else None
-        return built or find_previous_app({"apps": old_apps}, name=target_name)
-
-    if target_name == SIDELOADLABS_DISPLAY_NAME:
-        sideload_apps = JSON_PROVIDER.fetch(SIDeloadLABS_SOURCE_URL)
-        built = build_from_sideloadlabs(ensure_list(sideload_apps, "apps"))
-        return built or find_previous_app({"apps": old_apps}, name=target_name)
-
-    return None
-
-
-def update_source_apps(old_source, old_apps, target_name=None):
-    if not target_name:
-        apps = []
-        for config in GITHUB_APPS:
-            built = build_from_github(config)
-            if built: apps.append(built)
-            else:
-                previous = find_previous_app({"apps": old_apps}, bundle_id=config["bundleID"])
-                if previous: apps.append(previous)
-                else: print(f"❌ {config['name']}: update failed and no previous version available")
-
-        remote_apps = fetch_remote()
-        ipavault_data = JSON_PROVIDER.fetch(IPA_VAULT_SOURCE_URL)
-        ipavault_apps = ensure_list(ipavault_data, "apps")
-        for target in TARGET_APPS:
-            if target in IPA_VAULT_APPS:
-                built = build_from_ipavault(ipavault_apps, target)
-            else:
-                match = next((app for app in remote_apps or [] if isinstance(app, dict) and app.get("name") == target), None)
-                built = build_from_apptesters(match) if match else None
-            if built: apps.append(built)
-            else:
-                previous = find_previous_app({"apps": old_apps}, name=target)
-                if previous: apps.append(previous)
-                else: print(f"❌ {target}: update failed and no previous version available")
-
-        sideload_apps = JSON_PROVIDER.fetch(SIDeloadLABS_SOURCE_URL)
-        built = build_from_sideloadlabs(ensure_list(sideload_apps, "apps"))
-        if built: apps.append(built)
-        else:
-            previous = find_previous_app({"apps": old_apps}, name=SIDELOADLABS_DISPLAY_NAME)
-            if previous: apps.append(previous)
-            else: print(f"❌ {SIDELOADLABS_DISPLAY_NAME}: update failed and no previous version available")
-        return keep_latest_only(apps)
-
-    if target_name == "all":
-        return update_source_apps(old_source, old_apps)
-
-    updated = build_single_app(target_name, old_apps)
-    if not updated: raise ValueError(f"Unknown app or update failed: {target_name}")
-
-    target_bundle = updated.get("bundleIdentifier")
-    target_index = next((i for i, app in enumerate(old_apps) if isinstance(app, dict) and ((target_bundle and app.get("bundleIdentifier") == target_bundle) or app.get("name") == target_name)), None)
-    apps = list(old_apps)
-    if target_index is None: apps.append(updated)
-    else: apps[target_index] = updated
-    return keep_latest_only(apps)
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise ValueError(f"{name}: response is not valid JSON") from exc
+        if not isinstance(data, dict) or not isinstance(data.get("apps"), list):
+            raise ValueError(f"{name}: response does not contain an apps array")
+        catalogs.append((name, data))
+        print(f"   Found {len(data['apps'])} app entries")
+    return catalogs
 
 
 def main():
-    args = parse_args()
-    old_source = json.loads(Path(FILENAME).read_text(encoding="utf-8")) if Path(FILENAME).exists() else {}
-    old_apps = old_source.get("apps", []) if isinstance(old_source, dict) else []
-    apps = update_source_apps(old_source, old_apps, args.app)
-    checked_at = now_taiwan()
-    current_readme = Path(README_FILENAME).read_text(encoding="utf-8") if Path(README_FILENAME).exists() else ""
-    previous_content_update = get_previous_content_update(current_readme) if current_readme else "尚未更新"
-    previous_status_times = get_status_updated_at(current_readme)
-    content_changed = json.dumps(apps, ensure_ascii=False, sort_keys=True) != json.dumps(old_apps, ensure_ascii=False, sort_keys=True)
-    content_updated_at = checked_at if content_changed else previous_content_update
-    source = dict(old_source) if isinstance(old_source, dict) else {}
-    source.update({"name": DISPLAY_NAME, "identifier": "chi-source", "sourceURL": SOURCE_URL, "subtitle": "Chi's IPA Source", "description": SOURCE_DESCRIPTION, "website": "https://ipa.chi.qzz.io", "iconURL": SOURCE_ICON_URL, "featuredApps": [app["bundleIdentifier"] for app in apps], "apps": apps, "news": source.get("news", [])})
-    Path(FILENAME).write_text(json.dumps(source, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    statuses = {}
-    status_times = {}
-    old_by_name = {app.get("name"): app for app in old_apps if isinstance(app, dict)}
-    for app in apps:
-        name = app.get("name")
-        old = old_by_name.get(name)
-        new_ver = get_version(app)
-        old_ver = get_version(old) if old else None
-        if old_ver != new_ver:
-            statuses[name] = "Updated"
-            status_times[name] = checked_at
-        elif previous_status_times.get(name) and is_updated_within_day(previous_status_times[name], checked_at):
-            statuses[name] = "Updated"
-            status_times[name] = previous_status_times[name]
-        else:
-            statuses[name] = "Unchanged"
-    update_readme(apps, checked_at, content_updated_at, statuses, status_times)
+    try:
+        config = json.loads(SOURCES_FILE.read_text(encoding="utf-8"))
+        sources = config.get("sources") if isinstance(config, dict) else None
+        if not isinstance(sources, list) or not sources:
+            raise ValueError("sources.json must contain a non-empty sources array")
+
+        catalogs = load_catalogs(create_session(), sources)
+        source = build_source(catalogs)
+        OUTPUT_FILE.write_text(
+            json.dumps(source, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"✅ Wrote {len(source['apps'])} apps to {OUTPUT_FILE.name}")
+    except Exception as exc:
+        print(f"❌ Source sync failed: {exc}", file=sys.stderr)
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

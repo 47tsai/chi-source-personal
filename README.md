@@ -1,19 +1,31 @@
 # Chi Source Personal
 
-個人使用的 AltStore / SideStore Source，收錄自己感興趣的小眾 App、ACG、遊戲相關工具與 Tweaks。
+個人興趣向的 AltStore / SideStore Source，收錄 ACG、小眾 App 與自己想保留的工具。
 
-## 專案狀態
+## Source
 
-目前已搬入 Chi Source 的基本更新器、來源驗證、測試與 GitHub Actions CI 架構。這是初始化骨架，尚未完成個人源的 App 清單、來源識別資訊與正式部署設定。
+```text
+https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
+```
 
-- **Source 尚未部署**，請勿將此專案加入 AltStore / SideStore。
-- 自動更新流程暫時停用，避免沿用主源的 App 清單或來源網址。
-- 主源：[`chi-source`](https://github.com/tsai97216/chi-source)
+## 上游來源
+
+本專案會定期同步以下公開 AltStore Source，並合併成單一的 `apps.json`：
+
+- SpooferPro
+- OpenAni / Animeko
+- Kazumi
+- Aidoku
+
+同步時會保留上游版本、下載網址與 App 權限資訊；遇到重複的 Bundle ID 時，依 `sources.json` 的順序保留第一個來源。任一上游來源無法取得或資料格式不正確時，同步會失敗，不會以不完整資料覆蓋現有清單。
 
 ## 開發
 
 ```bash
 pip install -r requirements.txt
 python -m pytest -q
-python -m py_compile update_source.py validate_source.py
+python update_source.py
+python validate_source.py
 ```
+
+GitHub Actions 會在主分支更新、每六小時排程及手動觸發時同步來源。

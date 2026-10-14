@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "name": "SpooferPro",
+      "url": "https://altstore.spooferpro.com"
+    },
+    {
+      "name": "OpenAni",
+      "url": "https://raw.githubusercontent.com/maxchang3/ani-altstore-source/main/generated/apps.json"
+    },
+    {
+      "name": "Kazumi",
+      "url": "https://raw.githubusercontent.com/ChouChiu/Kazumi-AltStore-Source/kazumi/generated/apps.json"
+    },
+    {
+      "name": "Aidoku",
+      "url": "https://raw.githubusercontent.com/Aidoku/Aidoku/altstore/apps.json"
+    }
+  ]
+}

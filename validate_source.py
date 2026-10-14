@@ -5,11 +5,12 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
-from update_source import GITHUB_APPS, TARGET_APPS
-
 FILENAME = "apps.json"
-EXPECTED_APPS = {app["name"] for app in GITHUB_APPS} | set(TARGET_APPS) | {"EeveeSpotify Reincarnated"}
-
+VALID_CATEGORIES = {
+    "developer", "entertainment", "games", "lifestyle",
+    "other", "photo-video", "social", "utilities",
+}
+HEX_COLOR_RE = re.compile(r"^(?:#)?[0-9A-Fa-f]{6}$")
 REQUIRED_ROOT_FIELDS = {
     "name", "identifier", "sourceURL", "subtitle", "description",
     "website", "iconURL", "featuredApps", "apps", "news",
@@ -17,21 +18,11 @@ REQUIRED_ROOT_FIELDS = {
 REQUIRED_APP_FIELDS = {
     "name", "bundleIdentifier", "developerName", "subtitle",
     "localizedDescription", "iconURL", "tintColor", "category",
-    "screenshots", "versions",
+    "screenshots", "versions", "appPermissions",
 }
 REQUIRED_VERSION_FIELDS = {
     "version", "date", "localizedDescription", "downloadURL", "size",
 }
-HEX_COLOR_RE = re.compile(r"^(?:#)?[0-9A-Fa-f]{6}$")
-
-
-def fail(message):
-    print(f"❌ {message}")
-    return False
-
-
-def valid_nonempty_string(value):
-    return isinstance(value, str) and bool(value.strip())
 
 
 def valid_https_url(value):
@@ -40,12 +31,8 @@ def valid_https_url(value):
     try:
         parsed = urlparse(value)
         return parsed.scheme == "https" and bool(parsed.netloc)
-    except Exception:
+    except ValueError:
         return False
-
-
-def valid_hex_color(value):
-    return isinstance(value, str) and bool(HEX_COLOR_RE.fullmatch(value))
 
 
 def valid_date(value):
@@ -58,127 +45,144 @@ def valid_date(value):
         return False
 
 
+def version_identity(version):
+    return (version.get("version"), version.get("buildVersion", ""))
+
+
 def validate_source_data(source):
     if not isinstance(source, dict):
-        return fail("Root must be an object")
+        print("❌ Root must be an object")
+        return False
 
-    missing_root = REQUIRED_ROOT_FIELDS - set(source)
-    if missing_root:
-        return fail(f"Missing root fields: {', '.join(sorted(missing_root))}")
+    missing = REQUIRED_ROOT_FIELDS - set(source)
+    if missing:
+        print(f"❌ Missing root fields: {', '.join(sorted(missing))}")
+        return False
 
     for field in ("name", "identifier", "subtitle", "description"):
-        if not valid_nonempty_string(source[field]):
-            return fail(f"Invalid root field: {field}")
-
+        if not isinstance(source[field], str) or not source[field].strip():
+            print(f"❌ Invalid root field: {field}")
+            return False
     for field in ("sourceURL", "website", "iconURL"):
         if not valid_https_url(source[field]):
-            return fail(f"Invalid root URL: {field}")
-
-    for field in ("apps", "featuredApps", "news"):
-        if not isinstance(source[field], list):
-            return fail(f"{field} must be an array")
+            print(f"❌ Invalid root URL: {field}")
+            return False
 
     apps = source["apps"]
-    names = [app.get("name") for app in apps if isinstance(app, dict)]
-    missing = EXPECTED_APPS - set(names)
-    unexpected = set(names) - EXPECTED_APPS
-    if missing:
-        return fail(f"Missing expected apps: {', '.join(sorted(missing))}")
-    if unexpected:
-        return fail(f"Unexpected apps: {', '.join(sorted(unexpected))}")
-    if len(apps) != len(EXPECTED_APPS):
-        return fail(f"Expected {len(EXPECTED_APPS)} apps, found {len(apps)}")
+    if not isinstance(apps, list) or not apps:
+        print("❌ apps must be a non-empty array")
+        return False
+    if not isinstance(source["featuredApps"], list) or not isinstance(source["news"], list):
+        print("❌ featuredApps and news must be arrays")
+        return False
 
     bundle_ids = set()
     for app in apps:
         if not isinstance(app, dict):
-            return fail("Every app entry must be an object")
-
+            print("❌ Every app entry must be an object")
+            return False
         missing_fields = REQUIRED_APP_FIELDS - set(app)
         if missing_fields:
-            return fail(
-                f"{app.get('name', 'Unknown')}: missing fields: "
-                f"{', '.join(sorted(missing_fields))}"
-            )
+            print(f"❌ {app.get('name', 'Unknown')}: missing fields: {', '.join(sorted(missing_fields))}")
+            return False
 
-        app_name = app["name"]
-        for field in (
-            "name", "bundleIdentifier", "developerName",
-            "subtitle", "localizedDescription", "category",
-        ):
-            if not valid_nonempty_string(app[field]):
-                return fail(f"{app_name}: invalid field: {field}")
-
+        for field in ("name", "bundleIdentifier", "developerName", "subtitle", "localizedDescription"):
+            if not isinstance(app[field], str) or not app[field].strip():
+                print(f"❌ Invalid app field: {app.get('name', 'Unknown')} / {field}")
+                return False
         bundle_id = app["bundleIdentifier"]
         if bundle_id in bundle_ids:
-            return fail(f"Duplicate bundleIdentifier: {bundle_id}")
+            print(f"❌ Duplicate bundleIdentifier: {bundle_id}")
+            return False
         bundle_ids.add(bundle_id)
 
         if not valid_https_url(app["iconURL"]):
-            return fail(f"{app_name}: invalid iconURL")
-        if not valid_hex_color(app["tintColor"]):
-            return fail(f"{app_name}: invalid tintColor")
+            print(f"❌ {app['name']}: invalid iconURL")
+            return False
+        if not isinstance(app["tintColor"], str) or not HEX_COLOR_RE.fullmatch(app["tintColor"]):
+            print(f"❌ {app['name']}: invalid tintColor")
+            return False
+        if app["category"] not in VALID_CATEGORIES:
+            print(f"❌ {app['name']}: invalid category")
+            return False
 
-        if not isinstance(app["screenshots"], list):
-            return fail(f"{app_name}: screenshots must be an array")
-        for screenshot in app["screenshots"]:
-            if not valid_https_url(screenshot):
-                return fail(f"{app_name}: invalid screenshot URL")
+        screenshots = app["screenshots"]
+        if not isinstance(screenshots, list):
+            print(f"❌ {app['name']}: screenshots must be an array")
+            return False
+        for screenshot in screenshots:
+            if not isinstance(screenshot, dict) or not valid_https_url(screenshot.get("imageURL")):
+                print(f"❌ {app['name']}: invalid screenshot entry")
+                return False
+
+        permissions = app["appPermissions"]
+        if not isinstance(permissions, dict):
+            print(f"❌ {app['name']}: appPermissions must be an object")
+            return False
+        if not isinstance(permissions.get("entitlements", []), list):
+            print(f"❌ {app['name']}: entitlements must be an array")
+            return False
+        if not isinstance(permissions.get("privacy", {}), dict):
+            print(f"❌ {app['name']}: privacy must be an object")
+            return False
 
         versions = app["versions"]
         if not isinstance(versions, list) or not versions:
-            return fail(f"{app_name}: versions must be a non-empty array")
-
+            print(f"❌ {app['name']}: versions must be a non-empty array")
+            return False
         seen_versions = set()
         for index, version in enumerate(versions):
             if not isinstance(version, dict):
-                return fail(f"{app_name}: version {index} must be an object")
-
+                print(f"❌ {app['name']}: version {index} must be an object")
+                return False
             missing_version_fields = REQUIRED_VERSION_FIELDS - set(version)
             if missing_version_fields:
-                return fail(
-                    f"{app_name}: version {index} missing fields: "
-                    f"{', '.join(sorted(missing_version_fields))}"
-                )
-
-            version_name = version["version"]
-            if not valid_nonempty_string(version_name):
-                return fail(f"{app_name}: version {index} has an invalid version")
-            if version_name in seen_versions:
-                return fail(f"{app_name}: duplicate version: {version_name}")
-            seen_versions.add(version_name)
-
+                print(f"❌ {app['name']}: version {index} missing fields: {', '.join(sorted(missing_version_fields))}")
+                return False
+            if not isinstance(version["version"], str) or not version["version"].strip():
+                print(f"❌ {app['name']}: invalid version string")
+                return False
             if not valid_date(version["date"]):
-                return fail(f"{app_name}: invalid version date: {version['date']}")
+                print(f"❌ {app['name']}: invalid version date {version['date']!r}")
+                return False
             if not isinstance(version["localizedDescription"], str):
-                return fail(f"{app_name}: invalid version description")
-            if not valid_https_url(version["downloadURL"]):
-                return fail(f"{app_name}: invalid downloadURL")
-            if not str(version["downloadURL"]).lower().split("?", 1)[0].endswith(".ipa"):
-                return fail(f"{app_name}: downloadURL is not an IPA")
+                print(f"❌ {app['name']}: invalid version description")
+                return False
+            url = version["downloadURL"]
+            if not valid_https_url(url) or not url.lower().split("?", 1)[0].endswith(".ipa"):
+                print(f"❌ {app['name']}: invalid IPA downloadURL")
+                return False
             if type(version["size"]) is not int or version["size"] <= 0:
-                return fail(f"{app_name}: invalid IPA size")
+                print(f"❌ {app['name']}: invalid IPA size")
+                return False
+            identity = version_identity(version)
+            if identity in seen_versions:
+                print(f"❌ {app['name']}: duplicate version identity {identity}")
+                return False
+            seen_versions.add(identity)
 
-    expected_featured = [app["bundleIdentifier"] for app in apps]
-    if source["featuredApps"] != expected_featured:
-        return fail("featuredApps does not match apps order")
+    if set(source["featuredApps"]) != bundle_ids:
+        print("❌ featuredApps does not match the app bundle identifiers")
+        return False
 
-    print(f"✅ Source validation passed: {len(apps)} apps")
+    for item in source["news"]:
+        if not isinstance(item, dict):
+            print("❌ Every news entry must be an object")
+            return False
+
+    print(f"✅ Valid AltStore source: {len(apps)} apps")
     return True
 
 
-def validate_source():
-    path = Path(FILENAME)
-    if not path.exists():
-        return fail(f"{FILENAME} does not exist")
-
+def main():
     try:
-        source = json.loads(path.read_text(encoding="utf-8"))
+        source = json.loads(Path(FILENAME).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        return fail(f"Cannot parse {FILENAME}: {exc}")
-
-    return validate_source_data(source)
+        print(f"❌ Could not read {FILENAME}: {exc}")
+        raise SystemExit(1)
+    if not validate_source_data(source):
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
-    sys.exit(0 if validate_source() else 1)
+    main()

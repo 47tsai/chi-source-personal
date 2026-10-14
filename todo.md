@@ -1,11 +1,11 @@
 # Chi Source Personal TODO
 
-## 初始化
-- [x] 搬入主源的更新器、Provider、驗證器與測試架構
-- [x] 建立獨立的 GitHub Actions CI
-- [x] 暫停排程與自動提交，避免誤更新個人源
-- [ ] 將更新器中的來源名稱、識別碼、Source URL 與圖示路徑改為 Personal
-- [ ] 整理個人源專用 App 清單與更新策略
-- [ ] 補齊／確認個人源圖示與 App 圖示
-- [ ] 完成 AltStore Source 驗證與部署設定
-- [ ] 完成首次更新流程測試後，再啟用排程
+## Source 整合
+- [x] 加入 SpooferPro、OpenAni / Animeko、Kazumi、Aidoku 四個上游來源
+- [x] 建立通用來源合併器，保留版本與權限 metadata
+- [x] 正規化不同來源的 screenshots 格式
+- [x] 以 Bundle ID 去重，避免 AltStore Source 出現重複 App
+- [x] 加入來源同步與 AltStore schema 驗證測試
+- [x] 設定 GitHub Actions 定期同步及手動觸發
+- [ ] 首次同步完成後確認 Actions 與產生的 apps.json
+- [ ] 後續再決定是否補上 Personal 專用圖示
