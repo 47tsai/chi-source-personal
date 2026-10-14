@@ -178,10 +178,9 @@ def normalize_app(raw, source_name):
     return app
 
 
-def merge_catalogs(catalogs, excluded_bundle_ids=None):
-    """Merge (source_name, source_json) pairs; the first bundle ID wins."""
-    excluded_bundle_ids = set(excluded_bundle_ids or [])
-    excluded_bundle_ids.add("com.spooferpro.pokemongo")
+def merge_catalogs(catalogs, allowed_bundle_ids=None):
+    """Merge configured apps from source catalogs; the first bundle ID wins."""
+    allowed_bundle_ids = set(allowed_bundle_ids) if allowed_bundle_ids is not None else None
     apps = []
     seen_bundle_ids = set()
     news = []
@@ -192,11 +191,13 @@ def merge_catalogs(catalogs, excluded_bundle_ids=None):
             raise ValueError(f"{source_name}: source JSON has no apps array")
 
         for raw_app in catalog["apps"]:
+            if not isinstance(raw_app, dict):
+                raise ValueError(f"{source_name}: app entry is not an object")
+            raw_bundle_id = raw_app.get("bundleIdentifier")
+            if allowed_bundle_ids is not None and raw_bundle_id not in allowed_bundle_ids:
+                continue
             app = normalize_app(raw_app, source_name)
             bundle_id = app["bundleIdentifier"]
-            if bundle_id in excluded_bundle_ids:
-                print(f"Excluded by configuration: {app['name']} ({bundle_id})")
-                continue
             if bundle_id in seen_bundle_ids:
                 print(f"⚠️ Duplicate bundle ID skipped: {app['name']} ({bundle_id})")
                 continue
@@ -227,8 +228,8 @@ def merge_catalogs(catalogs, excluded_bundle_ids=None):
     return apps, news
 
 
-def build_source(catalogs, excluded_bundle_ids=None):
-    apps, news = merge_catalogs(catalogs, excluded_bundle_ids)
+def build_source(catalogs, allowed_bundle_ids=None):
+    apps, news = merge_catalogs(catalogs, allowed_bundle_ids)
     return {
         "name": SOURCE_NAME,
         "identifier": SOURCE_IDENTIFIER,
@@ -392,7 +393,13 @@ def main():
                 sources.append({"name": source_name, "url": source_url})
 
         catalogs = load_catalogs(create_session(), sources)
-        source = build_source(catalogs)
+        allowed_bundle_ids = {
+            app["bundleID"] for app in app_configs
+            if isinstance(app.get("bundleID"), str) and app["bundleID"].strip()
+        }
+        if len(allowed_bundle_ids) != len(app_configs):
+            raise ValueError("Every configured app must have a unique, non-empty bundleID")
+        source = build_source(catalogs, allowed_bundle_ids)
         old_source = {}
         if OUTPUT_FILE.exists():
             try:
