@@ -1410,7 +1410,7 @@
       "category": "utilities",
       "versions": [
         {
-          "version": "EnsWilde3.1.3",
+          "version": "3.1.3",
           "buildVersion": "EnsWilde3.1.3",
           "date": "2026-02-25T15:28:02Z",
           "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1.3/EnsWilde.ipa",
@@ -1418,7 +1418,7 @@
           "localizedDescription": "# EnsWilde v3.1.3\r\n\r\n## Updates\r\n- You can now download DDI, fully resolving all DDI-related issues (updated via Settings)\r\n\r\n## Features\r\n- Added an option to hide the Dynamic Island in Theme UI  \r\n  *(A device restart is required for this feature to take effect)*\r\n- Added Feature Flags for in-app functionalities  \r\n  *(A device restart is required for this feature to take effect)*\r\n- zpatch Custom no longer requires a password\r\n\r\n## Guides\r\n- Updated the guide for obtaining default passcode files and Apple Wallet files  \r\n  *(You will need a Mac or a device that can receive AirDrop)*  \r\n  *(The guide is available in Settings)*"
         },
         {
-          "version": "EnsWilde3.1.2",
+          "version": "3.1.2",
           "buildVersion": "EnsWilde3.1.2",
           "date": "2026-02-01T14:58:19Z",
           "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1.2/EnsWilde.ipa",
@@ -1426,7 +1426,7 @@
           "localizedDescription": "# Fixes & Improvements\r\n\r\n## Bug Fixes\r\n- Fixed **StkJIT Code = -1** and **StkJIT Code = -60**\r\n- Fixed application **crash caused by outdated or invalid pairing files**\r\n  - A warning message is now shown instead of crashing when an old pairing file is detected\r\n\r\n## Testing & Verification\r\n- Tested and confirmed working on **LiveContainer**\r\n- Signed using a **personal certificate**\r\n\r\n---\r\nThank you for using and supporting the project.\r\n"
         },
         {
-          "version": "EnsWilde3.1.1",
+          "version": "3.1.1",
           "buildVersion": "EnsWilde3.1.1",
           "date": "2026-01-22T11:37:58Z",
           "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1.1/EnsWilde.ipa",
@@ -1434,7 +1434,7 @@
           "localizedDescription": "# Changelog\r\n\r\n## Bug Fixes\r\n- Fixed an issue where **rdar** was not working in **Mobile Gestalt**\r\n\r\n## New Features\r\n- Added a **Themes Store** to download passcode themes  \r\n  - You can also create your own custom theme  \r\n  - Contact me if you want your theme to be added\r\n\r\n## Language Support\r\n- Added **multi-language support**  \r\n  - If you want to contribute a new language, please contact me"
         },
         {
-          "version": "EnsWilde3.1",
+          "version": "3.1",
           "buildVersion": "EnsWilde3.1",
           "date": "2026-01-19T15:53:10Z",
           "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.1/EnsWilde.ipa",
@@ -1442,7 +1442,7 @@
           "localizedDescription": "## ✅ Update Notes\r\n\r\n### Fixed\r\n- DDI issue has been resolved\r\n\r\n### Improvements\r\n- Added multi-language support\r\n\r\n### New Features\r\n- UI Theme option added  \r\n  - Allows disabling the Liquid Glass effect for a cleaner and smoother interface\r\n"
         },
         {
-          "version": "EnsWilde3.0",
+          "version": "3.0",
           "buildVersion": "EnsWilde3.0",
           "date": "2026-01-18T07:14:23Z",
           "downloadURL": "https://github.com/YangJiiii/EnsWilde/releases/download/EnsWilde3.0/EnsWilde.ipa",
