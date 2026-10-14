@@ -124,6 +124,19 @@
       "asset_keywords": [
         "enswilde"
       ]
+    },
+    {
+      "repo": "StephenDev0/StikDebug",
+      "name": "StikDebug",
+      "bundleID": "com.stik.stikdebug",
+      "author": "StephenDev0",
+      "repo_url": "https://github.com/StephenDev0/StikDebug",
+      "source_name": "StikDebug",
+      "source_url": "https://stikdebug.xyz/index.json",
+      "subtitle": "On-device debugger and JIT enabler for iOS",
+      "desc": "An on-device debugging utility for compatible iOS versions.",
+      "color": "007AFF",
+      "category": "developer"
     }
   ]
 }
