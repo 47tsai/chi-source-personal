@@ -3,6 +3,7 @@ import json
 import re
 import sys
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -266,6 +267,106 @@ def load_catalogs(session, sources):
     return catalogs
 
 
+
+APP_TABLE_START = "<!-- AUTO-UPDATE-APPS:START -->"
+APP_TABLE_END = "<!-- AUTO-UPDATE-APPS:END -->"
+STATUS_TIMES_START = "<!-- AUTO-UPDATE-STATUS-TIMES:START -->"
+STATUS_TIMES_END = "<!-- AUTO-UPDATE-STATUS-TIMES:END -->"
+
+
+def now_taiwan():
+    return datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def get_readme_status_times(readme):
+    match = re.search(
+        re.escape(STATUS_TIMES_START) + r"\\s*<!--\\s*(\\{.*?\\})\\s*-->\\s*" + re.escape(STATUS_TIMES_END),
+        readme,
+        flags=re.DOTALL,
+    )
+    if not match:
+        return {}
+    try:
+        data = json.loads(match.group(1))
+        return data if isinstance(data, dict) else {}
+    except json.JSONDecodeError:
+        return {}
+
+
+def update_readme(apps, old_apps, config):
+    path = ROOT / "README.md"
+    readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source Personal\\n"
+    checked_at = now_taiwan()
+    previous_content = re.search(r"最近內容更新：\\s*(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})", readme)
+    content_changed = json.dumps(apps, ensure_ascii=False, sort_keys=True) != json.dumps(old_apps, ensure_ascii=False, sort_keys=True)
+    content_updated_at = checked_at if content_changed else (previous_content.group(1) if previous_content else "尚未更新")
+    previous_times = get_readme_status_times(readme)
+    old_by_name = {app.get("name"): app for app in old_apps if isinstance(app, dict)}
+    app_meta = {item.get("name"): item for item in config.get("apps", []) if isinstance(item, dict)}
+    status_times = {}
+    rows = ["| App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |", "| --- | --- | --- | --- | --- | --- |"]
+
+    for app in apps:
+        name = app.get("name", "Unknown")
+        meta = app_meta.get(name, {})
+        author = meta.get("author") or app.get("developerName", "Unknown")
+        url = meta.get("repo_url", "")
+        app_link = f"[{name}]({url})" if url else name
+        latest = (app.get("versions") or [{}])[0]
+        old = old_by_name.get(name)
+        old_version = ((old or {}).get("versions") or [{}])[0].get("version")
+        new_version = latest.get("version", "N/A")
+        previous_time = previous_times.get(name)
+        try:
+            recent = previous_time and 0 <= (
+                datetime.strptime(checked_at, "%Y-%m-%d %H:%M:%S")
+                - datetime.strptime(previous_time, "%Y-%m-%d %H:%M:%S")
+            ).total_seconds() < 86400
+        except (TypeError, ValueError):
+            recent = False
+        if old_version != new_version:
+            status = "**Updated**"
+            status_times[name] = checked_at
+        elif recent:
+            status = "**Updated**"
+            status_times[name] = previous_time
+        else:
+            status = "Unchanged"
+        update_time = f"**{status_times[name]}**" if name in status_times else (latest.get("date") or "N/A")
+        rows.append(f"| **{app_link}** | {author} | {status} | {new_version} | {latest.get('date', 'N/A')} | {update_time} |")
+
+    table = "\\n".join([
+        APP_TABLE_START,
+        "## Apps 更新狀態",
+        "",
+        f"- **最近自動檢查：** {checked_at}（台灣時間）",
+        f"- **最近內容更新：** {content_updated_at}（台灣時間）",
+        "",
+        *rows,
+        "",
+        APP_TABLE_END,
+    ])
+    if APP_TABLE_START in readme and APP_TABLE_END in readme:
+        left = readme.index(APP_TABLE_START)
+        right = readme.index(APP_TABLE_END, left) + len(APP_TABLE_END)
+        readme = readme[:left] + table + readme[right:]
+    else:
+        readme = readme.rstrip() + "\\n\\n" + table + "\\n"
+
+    status_block = "\\n".join([
+        STATUS_TIMES_START,
+        f"<!-- {json.dumps(status_times, ensure_ascii=False, sort_keys=True)} -->",
+        STATUS_TIMES_END,
+    ])
+    if STATUS_TIMES_START in readme and STATUS_TIMES_END in readme:
+        left = readme.index(STATUS_TIMES_START)
+        right = readme.index(STATUS_TIMES_END, left) + len(STATUS_TIMES_END)
+        readme = readme[:left] + status_block + readme[right:]
+    else:
+        readme = readme.rstrip() + "\\n\\n" + status_block + "\\n"
+    path.write_text(readme, encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Update Chi Source Personal")
     parser.add_argument("--app", help="Only update the specified app. Omit or use 'all' to update all apps.")
@@ -282,6 +383,13 @@ def main():
         if not isinstance(excluded_bundle_ids, list) or not all(isinstance(item, str) and item.strip() for item in excluded_bundle_ids):
             raise ValueError("excludedBundleIdentifiers must be an array of non-empty strings")
         source = build_source(catalogs, excluded_bundle_ids)
+        old_source = {}
+        if OUTPUT_FILE.exists():
+            try:
+                old_source = json.loads(OUTPUT_FILE.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                old_source = {}
+        old_apps_for_status = old_source.get("apps", []) if isinstance(old_source, dict) else []
 
         if args.app and args.app.lower() != "all":
             existing = {}
