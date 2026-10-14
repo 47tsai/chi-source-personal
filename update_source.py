@@ -381,7 +381,7 @@ def format_display_date(value):
     """Show version dates as YYYY-MM-DD in the README table."""
     if not isinstance(value, str):
         return "N/A"
-    match = re.match(r"^(\\d{4}-\\d{2}-\\d{2})", value.strip())
+    match = re.match(r"^(\d{4}-\d{2}-\d{2})", value.strip())
     return match.group(1) if match else value
 
 
