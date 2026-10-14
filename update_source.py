@@ -377,6 +377,14 @@ def get_readme_status_times(readme):
         return {}
 
 
+def format_display_date(value):
+    """Show version dates as YYYY-MM-DD in the README table."""
+    if not isinstance(value, str):
+        return "N/A"
+    match = re.match(r"^(\\d{4}-\\d{2}-\\d{2})", value.strip())
+    return match.group(1) if match else value
+
+
 def update_readme(apps, old_apps, config):
     path = ROOT / "README.md"
     readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source Personal\n"
@@ -419,7 +427,7 @@ def update_readme(apps, old_apps, config):
         else:
             status = "Unchanged"
         update_time = f"**{status_times[name]}**" if name in status_times else (latest.get("date") or "N/A")
-        rows.append(f"| **{app_link}** | {author} | {status} | {new_version} | {latest.get('date', 'N/A')} | {update_time} |")
+        rows.append(f"| **{app_link}** | {author} | {status} | {new_version} | {format_display_date(latest.get('date'))} | {update_time} |")
 
     table = "\n".join([
         APP_TABLE_START,
