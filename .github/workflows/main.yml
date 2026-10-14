@@ -1,65 +1,68 @@
-name: Chi Source Personal
+name: Auto Update Chi Source Personal
 
 on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
   schedule:
-    - cron: "23 */6 * * *"
+    - cron: '0 * * * *'
   workflow_dispatch:
-
-permissions:
-  contents: write
+    inputs:
+      app:
+        description: "App to update (default: all)"
+        required: false
+        default: "all"
+        type: string
 
 concurrency:
-  group: chi-source-personal
+  group: auto-update-chi-source-personal
   cancel-in-progress: false
 
 jobs:
-  test:
-    if: github.event_name == 'pull_request'
+  run:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: '3.10'
           cache: pip
-      - name: Install dependencies
+
+      - name: Install deps
         run: pip install --disable-pip-version-check --no-input -r requirements.txt
+
       - name: Validate Python
-        run: python -m py_compile update_source.py validate_source.py test_update_source.py test_validate_source.py test_special_versions.py
+        run: python -m py_compile update_source.py validate_source.py test_update_source.py test_validate_source.py
+
       - name: Run tests
         run: python -m pytest -q
-      - name: Validate JSON configuration
-        run: python -m json.tool sources.json > /dev/null
 
-  sync:
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.10"
-          cache: pip
-      - name: Install dependencies
-        run: pip install --disable-pip-version-check --no-input -r requirements.txt
-      - name: Validate Python
-        run: python -m py_compile update_source.py validate_source.py
-      - name: Sync upstream app catalogs
-        run: python update_source.py
-      - name: Validate generated AltStore Source
+      - name: Run script
+        if: github.event_name != 'pull_request'
+        env:
+          UPDATE_APP: ${{ github.event.inputs.app || 'all' }}
+        run: python update_source.py --app "$UPDATE_APP"
+
+      - name: Validate generated JSON
+        run: python -m json.tool apps.json > /dev/null
+
+      - name: Validate app configuration
+        run: python -m json.tool app_config.json > /dev/null
+
+      - name: Validate AltStore Source
         run: python validate_source.py
-      - name: Check diff formatting
-        run: git diff --check
-      - name: Commit generated source
+
+      - name: Commit changes
+        if: github.event_name != 'pull_request'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: "auto: sync Chi Source Personal apps"
-          file_pattern: apps.json
+          commit_message: "auto: sync Chi Source"
+          file_pattern: apps.json README.md
