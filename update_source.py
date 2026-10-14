@@ -247,12 +247,95 @@ def build_source(catalogs, allowed_bundle_ids=None):
     }
 
 
+def load_github_release_catalog(session, app_config):
+    """Convert public GitHub release IPA assets into a one-app AltStore catalog."""
+    repo = app_config.get("github_repo")
+    if not isinstance(repo, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repo):
+        raise ValueError(f"{app_config.get('name', 'Unknown')}: invalid github_repo")
+
+    api_url = f"https://api.github.com/repos/{repo}/releases?per_page=30"
+    print(f"⬇️ Fetching GitHub releases for {app_config.get('name', repo)}: {api_url}")
+    response = session.get(api_url, timeout=25)
+    response.raise_for_status()
+    try:
+        releases = response.json()
+    except ValueError as exc:
+        raise ValueError(f"{repo}: GitHub releases response is not valid JSON") from exc
+    if not isinstance(releases, list):
+        raise ValueError(f"{repo}: GitHub releases response is not a list")
+
+    keywords = app_config.get("asset_keywords", [])
+    if not isinstance(keywords, list):
+        keywords = []
+    keywords = [word.casefold() for word in keywords if isinstance(word, str) and word.strip()]
+    versions = []
+    for release in releases:
+        if not isinstance(release, dict) or release.get("draft") or release.get("prerelease"):
+            continue
+        assets = release.get("assets", [])
+        if not isinstance(assets, list):
+            continue
+        ipa_assets = [
+            asset for asset in assets
+            if isinstance(asset, dict)
+            and isinstance(asset.get("name"), str)
+            and asset["name"].casefold().endswith(".ipa")
+            and is_https_url(asset.get("browser_download_url"))
+            and type(asset.get("size")) is int
+            and asset["size"] > 0
+        ]
+        if keywords:
+            matched = [
+                asset for asset in ipa_assets
+                if any(word in asset["name"].casefold() for word in keywords)
+            ]
+            if matched:
+                ipa_assets = matched
+        if not ipa_assets:
+            continue
+        asset = ipa_assets[0]
+        version = release.get("tag_name") or release.get("name")
+        date = release.get("published_at") or release.get("created_at")
+        if not isinstance(version, str) or not version.strip() or not isinstance(date, str):
+            continue
+        versions.append({
+            "version": version.strip().removeprefix("v"),
+            "buildVersion": version.strip(),
+            "date": date,
+            "downloadURL": asset["browser_download_url"],
+            "size": asset["size"],
+            "localizedDescription": release.get("body") or app_config.get("desc", ""),
+        })
+
+    if not versions:
+        raise ValueError(f"{repo}: no public release with a downloadable IPA asset was found")
+
+    app = {
+        "name": app_config.get("name"),
+        "bundleIdentifier": app_config.get("bundleID"),
+        "developerName": app_config.get("author") or app_config.get("name"),
+        "subtitle": app_config.get("subtitle") or app_config.get("name"),
+        "localizedDescription": app_config.get("desc", ""),
+        "iconURL": app_config.get("icon"),
+        "tintColor": "#" + str(app_config.get("color", "777777")).lstrip("#"),
+        "category": app_config.get("category", "other"),
+        "versions": versions,
+    }
+    return app_config.get("source_name") or app_config.get("name"), {"apps": [app]}
+
+
 def load_catalogs(session, sources):
     catalogs = []
     for source in sources:
         name = source.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError(f"Invalid source configuration: {source!r}")
+        if source.get("type") == "github_release":
+            catalogs.append(load_github_release_catalog(session, source.get("app_config", {})))
+            continue
+
         url = source.get("url")
-        if not isinstance(name, str) or not name.strip() or not is_https_url(url):
+        if not is_https_url(url):
             raise ValueError(f"Invalid source configuration: {source!r}")
         print(f"⬇️ Fetching {name}: {url}")
         response = session.get(url, timeout=25)
@@ -385,8 +468,17 @@ def main():
         seen_source_urls = set()
         for app_config in app_configs:
             source_name = app_config.get("source_name")
+            source_type = app_config.get("source_type", "altstore")
+            if not isinstance(source_name, str) or not source_name.strip():
+                raise ValueError(f"Invalid source configuration for {app_config.get('name', 'Unknown')}")
+            if source_type == "github_release":
+                github_repo = app_config.get("github_repo")
+                if not isinstance(github_repo, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", github_repo):
+                    raise ValueError(f"Invalid GitHub release configuration for {app_config.get('name', 'Unknown')}")
+                sources.append({"name": source_name, "type": "github_release", "app_config": app_config})
+                continue
             source_url = app_config.get("source_url")
-            if not isinstance(source_name, str) or not source_name.strip() or not is_https_url(source_url):
+            if not is_https_url(source_url):
                 raise ValueError(f"Invalid source configuration for {app_config.get('name', 'Unknown')}")
             if source_url not in seen_source_urls:
                 seen_source_urls.add(source_url)
