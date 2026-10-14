@@ -280,7 +280,7 @@ def now_taiwan():
 
 def get_readme_status_times(readme):
     match = re.search(
-        re.escape(STATUS_TIMES_START) + r"\\s*<!--\\s*(\\{.*?\\})\\s*-->\\s*" + re.escape(STATUS_TIMES_END),
+        re.escape(STATUS_TIMES_START) + r"\s*<!--\s*(\{.*?\})\s*-->\s*" + re.escape(STATUS_TIMES_END),
         readme,
         flags=re.DOTALL,
     )
@@ -295,9 +295,9 @@ def get_readme_status_times(readme):
 
 def update_readme(apps, old_apps, config):
     path = ROOT / "README.md"
-    readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source Personal\\n"
+    readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source Personal\n"
     checked_at = now_taiwan()
-    previous_content = re.search(r"最近內容更新：\\s*(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})", readme)
+    previous_content = re.search(r"最近內容更新：\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", readme)
     content_changed = json.dumps(apps, ensure_ascii=False, sort_keys=True) != json.dumps(old_apps, ensure_ascii=False, sort_keys=True)
     content_updated_at = checked_at if content_changed else (previous_content.group(1) if previous_content else "尚未更新")
     previous_times = get_readme_status_times(readme)
@@ -335,7 +335,7 @@ def update_readme(apps, old_apps, config):
         update_time = f"**{status_times[name]}**" if name in status_times else (latest.get("date") or "N/A")
         rows.append(f"| **{app_link}** | {author} | {status} | {new_version} | {latest.get('date', 'N/A')} | {update_time} |")
 
-    table = "\\n".join([
+    table = "\n".join([
         APP_TABLE_START,
         "## Apps 更新狀態",
         "",
@@ -351,9 +351,9 @@ def update_readme(apps, old_apps, config):
         right = readme.index(APP_TABLE_END, left) + len(APP_TABLE_END)
         readme = readme[:left] + table + readme[right:]
     else:
-        readme = readme.rstrip() + "\\n\\n" + table + "\\n"
+        readme = readme.rstrip() + "\n\n" + table + "\n"
 
-    status_block = "\\n".join([
+    status_block = "\n".join([
         STATUS_TIMES_START,
         f"<!-- {json.dumps(status_times, ensure_ascii=False, sort_keys=True)} -->",
         STATUS_TIMES_END,
@@ -363,7 +363,7 @@ def update_readme(apps, old_apps, config):
         right = readme.index(STATUS_TIMES_END, left) + len(STATUS_TIMES_END)
         readme = readme[:left] + status_block + readme[right:]
     else:
-        readme = readme.rstrip() + "\\n\\n" + status_block + "\\n"
+        readme = readme.rstrip() + "\n\n" + status_block + "\n"
     path.write_text(readme, encoding="utf-8")
 
 
@@ -376,7 +376,7 @@ def main():
         config = json.loads(SOURCES_FILE.read_text(encoding="utf-8"))
         sources = config.get("sources") if isinstance(config, dict) else None
         if not isinstance(sources, list) or not sources:
-            raise ValueError("sources.json must contain a non-empty sources array")
+            raise ValueError("app_config.json must contain a non-empty sources array")
 
         catalogs = load_catalogs(create_session(), sources)
         excluded_bundle_ids = config.get("excludedBundleIdentifiers", [])
