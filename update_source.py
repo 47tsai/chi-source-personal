@@ -358,7 +358,7 @@ STATUS_TIMES_START = "<!-- AUTO-UPDATE-STATUS-TIMES:START -->"
 STATUS_TIMES_END = "<!-- AUTO-UPDATE-STATUS-TIMES:END -->"
 
 
-def now_taiwan():
+def now_utc8():
     return datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d %H:%M:%S")
 
 
@@ -388,7 +388,7 @@ def format_display_date(value):
 def update_readme(apps, old_apps, config):
     path = ROOT / "README.md"
     readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source Personal\n"
-    checked_at = now_taiwan()
+    checked_at = now_utc8()
     previous_content = re.search(r"最近內容更新：\s*\**\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", readme)
     content_changed = json.dumps(apps, ensure_ascii=False, sort_keys=True) != json.dumps(old_apps, ensure_ascii=False, sort_keys=True)
     content_updated_at = checked_at if content_changed else (previous_content.group(1) if previous_content else "尚未更新")
@@ -433,8 +433,8 @@ def update_readme(apps, old_apps, config):
         APP_TABLE_START,
         "## Apps 更新狀態",
         "",
-        f"- **最近自動檢查：** {checked_at}（台灣時間）",
-        f"- **最近內容更新：** {content_updated_at}（台灣時間）",
+        f"- **最近自動檢查：** {checked_at}（UTC+8）",
+        f"- **最近內容更新：** {content_updated_at}（UTC+8）",
         "",
         *rows,
         "",
