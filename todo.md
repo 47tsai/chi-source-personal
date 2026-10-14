@@ -1,11 +1,34 @@
-# Chi Source Personal TODO
+# Chi Source TODO
 
-## Source 整合
-- [x] 加入 SpooferPro、OpenAni / Animeko、Kazumi、Aidoku 四個上游來源
-- [x] 建立通用來源合併器，保留版本與權限 metadata
-- [x] 正規化不同來源的 screenshots 格式
-- [x] 以 Bundle ID 去重，避免 AltStore Source 出現重複 App
-- [x] 加入來源同步與 AltStore schema 驗證測試
-- [x] 設定 GitHub Actions 定期同步及手動觸發
-- [ ] 首次同步完成後確認 Actions 與產生的 apps.json
-- [ ] 後續再決定是否補上 Personal 專用圖示
+## 架構融合
+- [x] 研究 AltGallery / AltGen 的設定檔、Provider、版本解析與 merge 機制
+- [x] 將 App 定義逐步從 update_source.py 抽離成獨立設定
+- [x] 抽象 GitHub、AltSource、AppTesters 等來源 Provider
+- [x] 保留現有的特殊 App 解析、IPA 驗證、Retry 與舊版本 fallback
+- [x] 加入單一 App 更新能力，避免每次都完整重跑
+
+## 可靠性
+- [x] 補齊 update_source.py 的狀態判定測試
+- [x] 檢查並強化 AltStore Source schema 驗證
+- [x] 檢查各來源失敗時的 fallback 行為
+- [x] 檢查版本、IPA asset 與檔案大小判定的邊界情況
+
+## CI / 維護
+- [x] 檢查 GitHub Actions 的更新流程與提交條件
+- [x] 確認自動更新不會因單一 App 失敗而破壞整個 Source
+- [x] 評估更新頻率、API 使用量與不必要的請求
+
+## README / Source
+- [x] 保留並完善更新狀態資訊
+- [x] 將 App 清單改為自動產生，避免 README 顯示過期更新日期
+- [x] 修正 Facebook / Threads 的來源標示為 IPA Vault
+- [ ] 評估加入 News / 更新紀錄
+- [x] 檢查 Source metadata、featuredApps 與 App metadata
+
+## 最後檢核
+- [x] Python 編譯（PR CI）
+- [x] pytest（PR CI）
+- [x] JSON 驗證（PR CI）
+- [x] AltStore Source 驗證（PR CI）
+- [ ] 實際執行 update_source.py（需確認合併後自動更新流程）
+- [ ] 檢查最終 diff 與合併結果
