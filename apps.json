@@ -1,0 +1,161 @@
+{
+  "name": "Chi Source",
+  "identifier": "chi-source",
+  "sourceURL": "https://ipa.chi.qzz.io",
+  "subtitle": "Chi's IPA Source",
+  "description": "iOS IPA Source",
+  "website": "https://ipa.chi.qzz.io",
+  "iconURL": "https://raw.githubusercontent.com/tsai97216/chi-source/main/source_icon.png",
+  "featuredApps": [
+    "com.bgg.piliplus",
+    "com.google.ios.youtube",
+    "com.google.ios.youtubemusic",
+    "com.facebook.Facebook",
+    "com.burbn.barcelona",
+    "com.burbn.instagram",
+    "com.spotify.client.patched"
+  ],
+  "apps": [
+    {
+      "name": "PiliPlus",
+      "bundleIdentifier": "com.bgg.piliplus",
+      "developerName": "bggRGjQaUbCoE",
+      "subtitle": "bggRGjQaUbCoE（2026-10-10）",
+      "localizedDescription": "第三方 Bilibili 客戶端，提供增強播放與其他功能。",
+      "iconURL": "https://raw.githubusercontent.com/tsai97216/chi-source/main/piliplus.png",
+      "tintColor": "B8D2C1",
+      "category": "entertainment",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "2.1.6.2",
+          "date": "2026-10-10",
+          "localizedDescription": "专栏支持跳转至评论 #3213\r\n其他调整 #3208 by @My-Responsitories\r\n\r\n修复 bug\r\n修复搜索风控验证 #3106\r\n修复窗口大小变化时图片闪烁 #2685\r\n修复安卓视频暂停时画面裁切问题 #3034 by @Hdy08",
+          "downloadURL": "https://github.com/bggRGjQaUbCoE/PiliPlus/releases/download/2.1.6.2/PiliPlus_ios_2.1.6%2B5472.ipa",
+          "size": 24353925
+        }
+      ]
+    },
+    {
+      "name": "YTKACE",
+      "bundleIdentifier": "com.google.ios.youtube",
+      "developerName": "itzzace",
+      "subtitle": "itzzace（2026-10-11）",
+      "localizedDescription": "An open-source YouTube enhancement for iOS.",
+      "iconURL": "https://raw.githubusercontent.com/tsai97216/chi-source/main/YT.png",
+      "tintColor": "E8A8B7",
+      "category": "entertainment",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "21.41.5",
+          "date": "2026-10-11",
+          "localizedDescription": "by @itzzace0\n\nWhat's new:\n• Updated to YouTube 21.41.5\n• Added Hide AI Channels, which hides videos from channels on the AiSList blocklist in your feed and search, with an option for the warnlist too\n• Swipe the SponsorBlock popup away to dismiss it\n\nFixed:\n• Shorts download button sometimes missing on the new Shorts UI\n• Auto-Skip and Play Shorts Once not working on the new Shorts UI\n• Pinch to fullscreen in Shorts freezing or starting the next Short\n• Loop button not looping when Local Queue i",
+          "downloadURL": "https://github.com/itzzace/ytkace/releases/download/v1.1.3/YTKACE_1.1.3_YouTube_21.41.5.ipa",
+          "size": 137158764
+        }
+      ]
+    },
+    {
+      "name": "MaxMusic",
+      "bundleIdentifier": "com.google.ios.youtubemusic",
+      "developerName": "Mark02-2012",
+      "subtitle": "Mark02-2012（2026-08-30）",
+      "localizedDescription": "MaxMusic is a fork of YTMusicUltimate with additional tweaks for YouTube Music on iOS.",
+      "iconURL": "https://raw.githubusercontent.com/Mark02-2012/YTMUltimatePLUS/MYmain/Resources/IMG_5914.png",
+      "tintColor": "E8A8B7",
+      "category": "entertainment",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "9.34.4",
+          "date": "2026-08-30",
+          "localizedDescription": "**Changed**\r\nYTMusic version",
+          "downloadURL": "https://github.com/Mark02-2012/MaxMusic/releases/download/YTMU%2B_9.34.4_2.4.1_%2884%29/YTMUltimate%2B_2.4.1_9.34.4.ipa",
+          "size": 104079008
+        }
+      ]
+    },
+    {
+      "name": "Facebook",
+      "bundleIdentifier": "com.facebook.Facebook",
+      "developerName": "IPA Vault",
+      "subtitle": "IPA Vault（2026-10-09）",
+      "localizedDescription": "Facebook 582.0.0 with iQFace 1.2",
+      "iconURL": "https://pub-dd800571175348b6a2745b3396360028.r2.dev/App%20Icons/Facebook-Icons/Facebook-AppStore-1024x1024.png",
+      "tintColor": "78A5E3",
+      "category": "social",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "582.0.0",
+          "date": "2026-10-09",
+          "localizedDescription": "IPA Vault build for Facebook (iQFace), version 582.0.0",
+          "downloadURL": "https://pub-dd800571175348b6a2745b3396360028.r2.dev/Facebook-582.0.0-iQFace.ipa",
+          "size": 234797502
+        }
+      ]
+    },
+    {
+      "name": "Threads",
+      "bundleIdentifier": "com.burbn.barcelona",
+      "developerName": "IPA Vault",
+      "subtitle": "IPA Vault（2026-10-13）",
+      "localizedDescription": "Threads 451.0 with ThreadSaver",
+      "iconURL": "https://pub-dd800571175348b6a2745b3396360028.r2.dev/App%20Icons/Threads-Icons/Threads-AppStore-1024x1024.png",
+      "tintColor": "858585",
+      "category": "social",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "451.0",
+          "date": "2026-10-13",
+          "localizedDescription": "IPA Vault build for Threads (ThreadSaver), version 451.0",
+          "downloadURL": "https://pub-dd800571175348b6a2745b3396360028.r2.dev/Threads-451.0-ThreadSaver.ipa",
+          "size": 112995145
+        }
+      ]
+    },
+    {
+      "name": "Instagram",
+      "bundleIdentifier": "com.burbn.instagram",
+      "developerName": "AppTesters",
+      "subtitle": "AppTesters（2026-06-10）",
+      "localizedDescription": "Injected with Premium",
+      "iconURL": "https://raw.githubusercontent.com/apptesters-org/AppTesters_Repo/main/icons/com.burbn.instagram.png",
+      "tintColor": "DC8FA1",
+      "category": "social",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "433.0.0",
+          "date": "2026-06-10",
+          "localizedDescription": "Injected with Premium",
+          "downloadURL": "https://github.com/apptesters-org/AppTesters_Repo/releases/download/10-06-2026/Instagram_433.0.0_Premium_%40thisismanpreets_apptesters.org.ipa",
+          "size": 282563167
+        }
+      ]
+    },
+    {
+      "name": "EeveeSpotify Reincarnated",
+      "bundleIdentifier": "com.spotify.client.patched",
+      "developerName": "SideloadLabs",
+      "subtitle": "SideloadLabs（2026-10-05）",
+      "localizedDescription": "Spotify Version: v9.1.88, EeveeSpotify Version: 7.0.0. Patched version, use this only if you're using paid cert, jailbroken, or trollstore",
+      "iconURL": "https://files.catbox.moe/9fgova.JPG",
+      "tintColor": "669878",
+      "category": "entertainment",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "9.1.88",
+          "date": "2026-10-05",
+          "localizedDescription": "Updated to Spotify v9.1.88, Full release notes on github",
+          "downloadURL": "https://files.catbox.moe/ogibmn.ipa",
+          "size": 13000000
+        }
+      ]
+    }
+  ],
+  "news": []
+}
