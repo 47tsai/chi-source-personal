@@ -176,8 +176,9 @@ def normalize_app(raw, source_name):
     return app
 
 
-def merge_catalogs(catalogs):
+def merge_catalogs(catalogs, excluded_bundle_ids=None):
     """Merge (source_name, source_json) pairs; the first bundle ID wins."""
+    excluded_bundle_ids = set(excluded_bundle_ids or [])
     apps = []
     seen_bundle_ids = set()
     news = []
@@ -190,6 +191,9 @@ def merge_catalogs(catalogs):
         for raw_app in catalog["apps"]:
             app = normalize_app(raw_app, source_name)
             bundle_id = app["bundleIdentifier"]
+            if bundle_id in excluded_bundle_ids:
+                print(f"Excluded by configuration: {app['name']} ({bundle_id})")
+                continue
             if bundle_id in seen_bundle_ids:
                 print(f"⚠️ Duplicate bundle ID skipped: {app['name']} ({bundle_id})")
                 continue
@@ -220,8 +224,8 @@ def merge_catalogs(catalogs):
     return apps, news
 
 
-def build_source(catalogs):
-    apps, news = merge_catalogs(catalogs)
+def build_source(catalogs, excluded_bundle_ids=None):
+    apps, news = merge_catalogs(catalogs, excluded_bundle_ids)
     return {
         "name": SOURCE_NAME,
         "identifier": SOURCE_IDENTIFIER,
@@ -268,7 +272,10 @@ def main():
             raise ValueError("sources.json must contain a non-empty sources array")
 
         catalogs = load_catalogs(create_session(), sources)
-        source = build_source(catalogs)
+        excluded_bundle_ids = config.get("excludedBundleIdentifiers", [])
+        if not isinstance(excluded_bundle_ids, list) or not all(isinstance(item, str) and item.strip() for item in excluded_bundle_ids):
+            raise ValueError("excludedBundleIdentifiers must be an array of non-empty strings")
+        source = build_source(catalogs, excluded_bundle_ids)
         OUTPUT_FILE.write_text(
             json.dumps(source, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
