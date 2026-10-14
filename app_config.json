@@ -1,53 +1,73 @@
 {
-  "sources": [
-    {
-      "name": "SpooferPro",
-      "url": "https://altstore.spooferpro.com",
-      "repo_url": "https://github.com/SpooferPro"
-    },
-    {
-      "name": "OpenAni",
-      "url": "https://raw.githubusercontent.com/maxchang3/ani-altstore-source/main/generated/apps.json",
-      "repo_url": "https://github.com/maxchang3/ani-altstore-source"
-    },
-    {
-      "name": "Kazumi",
-      "url": "https://raw.githubusercontent.com/ChouChiu/Kazumi-AltStore-Source/kazumi/generated/apps.json",
-      "repo_url": "https://github.com/ChouChiu/Kazumi-AltStore-Source"
-    },
-    {
-      "name": "Aidoku",
-      "url": "https://raw.githubusercontent.com/Aidoku/Aidoku/altstore/apps.json",
-      "repo_url": "https://github.com/Aidoku/Aidoku"
-    }
-  ],
   "apps": [
     {
+      "repo": "SpooferPro",
       "name": "SpooferPro Pokemon GO",
       "bundleID": "com.nianticlabs.pokemongo",
       "author": "SpooferPro",
-      "repo_url": "https://github.com/SpooferPro"
+      "repo_url": "https://github.com/SpooferPro",
+      "source_name": "SpooferPro",
+      "source_url": "https://altstore.spooferpro.com",
+      "icon": "https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/source_icon.png",
+      "subtitle": "SpooferPro",
+      "desc": "SpooferPro Pokemon GO app source.",
+      "color": "FFA900",
+      "category": "games",
+      "asset_keywords": [
+        "spooferpro",
+        "pokemon"
+      ]
     },
     {
+      "repo": "maxchang3/ani-altstore-source",
       "name": "Animeko",
       "bundleID": "org.animeko.animeko",
       "author": "openani",
-      "repo_url": "https://github.com/maxchang3/ani-altstore-source"
+      "repo_url": "https://github.com/maxchang3/ani-altstore-source",
+      "source_name": "OpenAni",
+      "source_url": "https://raw.githubusercontent.com/maxchang3/ani-altstore-source/main/generated/apps.json",
+      "icon": "https://raw.githubusercontent.com/maxchang3/ani-altstore-source/main/generated/icon.png",
+      "subtitle": "Animeko",
+      "desc": "Animeko app source.",
+      "color": "7E57C2",
+      "category": "entertainment",
+      "asset_keywords": [
+        "animeko"
+      ]
     },
     {
+      "repo": "ChouChiu/Kazumi-AltStore-Source",
       "name": "Kazumi",
       "bundleID": "com.example.kazumi",
       "author": "Predidit",
-      "repo_url": "https://github.com/ChouChiu/Kazumi-AltStore-Source"
+      "repo_url": "https://github.com/ChouChiu/Kazumi-AltStore-Source",
+      "source_name": "Kazumi",
+      "source_url": "https://raw.githubusercontent.com/ChouChiu/Kazumi-AltStore-Source/kazumi/generated/apps.json",
+      "icon": "https://raw.githubusercontent.com/ChouChiu/Kazumi-AltStore-Source/kazumi/generated/icon.png",
+      "subtitle": "Kazumi",
+      "desc": "Kazumi app source.",
+      "color": "42A5F5",
+      "category": "entertainment",
+      "asset_keywords": [
+        "kazumi"
+      ]
     },
     {
+      "repo": "Aidoku/Aidoku",
       "name": "Aidoku",
       "bundleID": "app.aidoku.Aidoku",
       "author": "Skitty",
-      "repo_url": "https://github.com/Aidoku/Aidoku"
+      "repo_url": "https://github.com/Aidoku/Aidoku",
+      "source_name": "Aidoku",
+      "source_url": "https://raw.githubusercontent.com/Aidoku/Aidoku/altstore/apps.json",
+      "icon": "https://aidoku.app/images/apple-touch-icon.png",
+      "subtitle": "Free and open source manga reader for iOS and iPadOS",
+      "desc": "A free and open source manga reading application for iOS and iPadOS.",
+      "color": "ff375f",
+      "category": "entertainment",
+      "asset_keywords": [
+        "aidoku"
+      ]
     }
-  ],
-  "excludedBundleIdentifiers": [
-    "com.spooferpro.pokemongo"
   ]
 }
