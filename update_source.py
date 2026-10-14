@@ -298,8 +298,11 @@ def load_github_release_catalog(session, app_config):
         date = release.get("published_at") or release.get("created_at")
         if not isinstance(version, str) or not version.strip() or not isinstance(date, str):
             continue
+        display_version = version.strip().removeprefix("v")
+        if app_config.get("name") == "EnsWilde":
+            display_version = re.sub(r"^EnsWilde", "", display_version, flags=re.IGNORECASE)
         versions.append({
-            "version": version.strip().removeprefix("v"),
+            "version": display_version,
             "buildVersion": version.strip(),
             "date": date,
             "downloadURL": asset["browser_download_url"],
@@ -426,7 +429,7 @@ def update_readme(apps, old_apps, config):
             status_times[name] = previous_time
         else:
             status = "Unchanged"
-        update_time = f"**{status_times[name]}**" if name in status_times else (latest.get("date") or "N/A")
+        update_time = f"**{format_display_date(status_times[name])}**" if name in status_times else format_display_date(latest.get("date") or "N/A")
         rows.append(f"| **{app_link}** | {author} | {status} | {new_version} | {format_display_date(latest.get('date'))} | {update_time} |")
 
     table = "\n".join([
