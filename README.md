@@ -1,6 +1,6 @@
 # Chi Source Personal
 
-個人興趣向的 AltStore / SideStore Source，收錄 ACG、小眾 App 與自己想保留的工具。
+AltStore / SideStore Source。
 
 ## Source
 
@@ -8,16 +8,24 @@
 https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
 ```
 
-## 上游來源
+<!-- AUTO-UPDATE-APPS:START -->
+## Apps 更新狀態
 
-本專案會定期同步以下公開 AltStore Source，並合併成單一的 `apps.json`：
+- **最近自動檢查：** 尚未檢查
+- **最近內容更新：** 尚未更新
 
-- SpooferPro
-- OpenAni / Animeko
-- Kazumi
-- Aidoku
+| App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
+| --- | --- | --- | --- | --- | --- |
+| **[SpooferPro Pokemon GO](https://github.com/SpooferPro)** | SpooferPro | Pending | 0.431.1 | 2026-10-12 | 2026-10-12 |
+| **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | Pending | 6.3.0 | 2026-10-13 | 2026-10-13 |
+| **[Kazumi](https://github.com/ChouChiu/Kazumi-AltStore-Source)** | Predidit | Pending | 2.3.8 | 2026-10-07 | 2026-10-07 |
+| **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Pending | 0.9 | 2026-09-03 | 2026-09-03 |
 
-同步時會保留上游版本、下載網址與 App 權限資訊；遇到重複的 Bundle ID 時，依 `sources.json` 的順序保留第一個來源。任一上游來源無法取得或資料格式不正確時，同步會失敗，不會以不完整資料覆蓋現有清單。
+<!-- AUTO-UPDATE-APPS:END -->
+
+<!-- AUTO-UPDATE-STATUS-TIMES:START -->
+<!-- {} -->
+<!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
 ## 開發
 
@@ -25,7 +33,6 @@ https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
 pip install -r requirements.txt
 python -m pytest -q
 python update_source.py
+python update_source.py --app Animeko
 python validate_source.py
 ```
-
-GitHub Actions 會在主分支更新、每六小時排程及手動觸發時同步來源。
