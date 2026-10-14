@@ -5,7 +5,7 @@ AltStore / SideStore Source。
 ## Source
 
 ```text
-https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/apps.json
+https://ipap.chi.qzz.io
 ```
 
 <!-- AUTO-UPDATE-APPS:START -->
