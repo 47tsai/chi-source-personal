@@ -297,7 +297,7 @@ def update_readme(apps, old_apps, config):
     path = ROOT / "README.md"
     readme = path.read_text(encoding="utf-8") if path.exists() else "# Chi Source Personal\n"
     checked_at = now_taiwan()
-    previous_content = re.search(r"最近內容更新：\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", readme)
+    previous_content = re.search(r"最近內容更新：\s*\**\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", readme)
     content_changed = json.dumps(apps, ensure_ascii=False, sort_keys=True) != json.dumps(old_apps, ensure_ascii=False, sort_keys=True)
     content_updated_at = checked_at if content_changed else (previous_content.group(1) if previous_content else "尚未更新")
     previous_times = get_readme_status_times(readme)
