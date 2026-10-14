@@ -106,6 +106,24 @@
         "wallet",
         "wallpapers"
       ]
+    },
+    {
+      "repo": "YangJiiii/EnsWilde",
+      "name": "EnsWilde",
+      "bundleID": "com.yangjiii.EnsWilde",
+      "author": "YangJiiii",
+      "repo_url": "https://github.com/YangJiiii/EnsWilde",
+      "source_name": "EnsWilde",
+      "source_type": "github_release",
+      "github_repo": "YangJiiii/EnsWilde",
+      "icon": "https://raw.githubusercontent.com/YangJiiii/EnsWilde/main/MyApp_Dark_1024.png",
+      "subtitle": "iOS customization tools for Wallet and passcode themes",
+      "desc": "An experimental on-device iOS customization app. Features and compatibility depend on the iOS version; back up your device before use.",
+      "color": "6750A4",
+      "category": "utilities",
+      "asset_keywords": [
+        "enswilde"
+      ]
     }
   ]
 }
