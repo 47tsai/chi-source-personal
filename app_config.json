@@ -21,6 +21,32 @@
       "repo_url": "https://github.com/Aidoku/Aidoku"
     }
   ],
+  "apps": [
+    {
+      "name": "SpooferPro Pokemon GO",
+      "bundleID": "com.nianticlabs.pokemongo",
+      "author": "SpooferPro",
+      "repo_url": "https://github.com/SpooferPro"
+    },
+    {
+      "name": "Animeko",
+      "bundleID": "org.animeko.animeko",
+      "author": "openani",
+      "repo_url": "https://github.com/maxchang3/ani-altstore-source"
+    },
+    {
+      "name": "Kazumi",
+      "bundleID": "com.example.kazumi",
+      "author": "Predidit",
+      "repo_url": "https://github.com/ChouChiu/Kazumi-AltStore-Source"
+    },
+    {
+      "name": "Aidoku",
+      "bundleID": "app.aidoku.Aidoku",
+      "author": "Skitty",
+      "repo_url": "https://github.com/Aidoku/Aidoku"
+    }
+  ],
   "excludedBundleIdentifiers": [
     "com.spooferpro.pokemongo"
   ]
