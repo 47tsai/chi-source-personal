@@ -429,6 +429,7 @@ def main():
             json.dumps(source, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+        update_readme(source["apps"], old_apps_for_status, config)
         print(f"✅ Wrote {len(source['apps'])} apps to {OUTPUT_FILE.name}")
     except Exception as exc:
         print(f"❌ Source sync failed: {exc}", file=sys.stderr)
