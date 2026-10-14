@@ -11,12 +11,12 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:START -->
 ## Apps 更新狀態
 
-- **最近自動檢查：** 2026-10-15 04:30:15（UTC+8）
-- **最近內容更新：** 2026-10-15 04:30:15（UTC+8）
+- **最近自動檢查：** 2026-10-15 07:45:26（UTC+8）
+- **最近內容更新：** 2026-10-15 07:45:26（UTC+8）
 
 | App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
 | --- | --- | --- | --- | --- | --- |
-| **[SpooferPro Pokemon GO](https://spooferpro.com)** | SpooferPro | Unchanged | 0.431.1 | 2026-10-12 | 2026-10-12 |
+| **[SpooferPro Pokemon GO](https://spooferpro.com)** | SpooferPro | **Updated** | 0.433.0 | 2026-10-14 | **2026-10-15** |
 | **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | Unchanged | 6.3.0 | 2026-10-13 | 2026-10-13 |
 | **[Kazumi](https://github.com/ChouChiu/Kazumi-AltStore-Source)** | Predidit | **Updated** | 2.3.9 | 2026-10-14 | **2026-10-15** |
 | **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Unchanged | 0.9 | 2026-09-03 | 2026-09-03 |
@@ -28,7 +28,7 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:END -->
 
 <!-- AUTO-UPDATE-STATUS-TIMES:START -->
-<!-- {"AirCard-iOS": "2026-10-14 20:03:50", "EnsWilde": "2026-10-14 20:03:50", "Kazumi": "2026-10-15 04:30:15", "Photos Backup": "2026-10-14 20:03:50", "StikDebug": "2026-10-14 20:03:50"} -->
+<!-- {"AirCard-iOS": "2026-10-14 20:03:50", "EnsWilde": "2026-10-14 20:03:50", "Kazumi": "2026-10-15 04:30:15", "Photos Backup": "2026-10-14 20:03:50", "SpooferPro Pokemon GO": "2026-10-15 07:45:26", "StikDebug": "2026-10-14 20:03:50"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
 ## 開發
