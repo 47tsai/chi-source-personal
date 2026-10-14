@@ -98,3 +98,93 @@ def test_invalid_source_entry_fails_loudly():
         assert "bundleIdentifier" in str(exc)
     else:
         raise AssertionError("Expected malformed source entry to fail")
+
+class FakeResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self.payload
+
+
+class FakeSession:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def get(self, url, timeout):
+        assert url.endswith("/releases?per_page=30")
+        assert timeout == 25
+        return FakeResponse(self.payload)
+
+
+def test_github_release_catalog_uses_ipa_asset():
+    config = {
+        "name": "Example App",
+        "bundleID": "com.example.app",
+        "author": "Example",
+        "source_name": "Example Releases",
+        "github_repo": "example/app",
+        "icon": "https://example.com/icon.png",
+        "subtitle": "Example subtitle",
+        "desc": "Example description",
+        "color": "123456",
+        "category": "utilities",
+        "asset_keywords": ["example"],
+    }
+    releases = [{
+        "draft": False,
+        "prerelease": False,
+        "tag_name": "v1.2.3",
+        "published_at": "2026-10-01T12:00:00Z",
+        "body": "Release notes",
+        "assets": [
+            {
+                "name": "ExampleApp.ipa",
+                "browser_download_url": "https://github.com/example/app/releases/download/v1.2.3/ExampleApp.ipa",
+                "size": 12345,
+            },
+            {
+                "name": "checksums.txt",
+                "browser_download_url": "https://github.com/example/app/releases/download/v1.2.3/checksums.txt",
+                "size": 120,
+            },
+        ],
+    }]
+    name, catalog = updater.load_github_release_catalog(FakeSession(releases), config)
+    assert name == "Example Releases"
+    app = catalog["apps"][0]
+    assert app["bundleIdentifier"] == "com.example.app"
+    assert app["versions"][0]["version"] == "1.2.3"
+    assert app["versions"][0]["buildVersion"] == "v1.2.3"
+    assert app["versions"][0]["downloadURL"].endswith("ExampleApp.ipa")
+    assert app["versions"][0]["size"] == 12345
+
+
+def test_github_release_catalog_fails_without_ipa():
+    config = {
+        "name": "Example App",
+        "bundleID": "com.example.app",
+        "github_repo": "example/app",
+        "asset_keywords": ["example"],
+    }
+    releases = [{
+        "draft": False,
+        "prerelease": False,
+        "tag_name": "v1.0",
+        "published_at": "2026-10-01T12:00:00Z",
+        "assets": [{
+            "name": "source.zip",
+            "browser_download_url": "https://github.com/example/app/releases/download/v1.0/source.zip",
+            "size": 123,
+        }],
+    }]
+    try:
+        updater.load_github_release_catalog(FakeSession(releases), config)
+    except ValueError as exc:
+        assert "no public release" in str(exc)
+    else:
+        raise AssertionError("Expected missing IPA release to fail")
+
