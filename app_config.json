@@ -76,8 +76,6 @@
       "author": "g8row",
       "repo_url": "https://github.com/g8row/PhotosBackup",
       "source_name": "PhotosBackup",
-      "source_type": "github_release",
-      "github_repo": "g8row/PhotosBackup",
       "icon": "https://raw.githubusercontent.com/g8row/PhotosBackup/main/App/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png",
       "subtitle": "Back up iPhone photos and videos to Google Photos",
       "desc": "An experimental on-device iOS app for backing up photos, videos, and albums to Google Photos.",
@@ -86,7 +84,8 @@
       "asset_keywords": [
         "photosbackup",
         "google-photos"
-      ]
+      ],
+      "source_url": "https://g8row.github.io/PhotosBackup/apps.json"
     },
     {
       "repo": "Mak5er/AirCard-iOS",
