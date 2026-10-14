@@ -44,6 +44,20 @@ def test_duplicate_bundle_ids_keep_first_source():
     assert apps[0]["name"] == "First"
 
 
+
+def test_allowed_bundle_ids_filter_unconfigured_apps():
+    catalog = {
+        "apps": [
+            make_app("Keep", "com.example.keep"),
+            make_app("Skip", "com.example.skip"),
+        ]
+    }
+    apps, _ = updater.merge_catalogs(
+        [("Fixture", catalog)],
+        allowed_bundle_ids={"com.example.keep"},
+    )
+    assert [app["name"] for app in apps] == ["Keep"]
+
 def test_build_source_creates_personal_metadata():
     catalog = {"apps": [make_app()]}
     source = updater.build_source([("Fixture", catalog)])
