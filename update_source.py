@@ -179,6 +179,7 @@ def normalize_app(raw, source_name):
 def merge_catalogs(catalogs, excluded_bundle_ids=None):
     """Merge (source_name, source_json) pairs; the first bundle ID wins."""
     excluded_bundle_ids = set(excluded_bundle_ids or [])
+    excluded_bundle_ids.add("com.spooferpro.pokemongo")
     apps = []
     seen_bundle_ids = set()
     news = []
