@@ -1,3 +1,4 @@
+import argparse
 import json
 import re
 import sys
@@ -266,6 +267,10 @@ def load_catalogs(session, sources):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Update Chi Source Personal")
+    parser.add_argument("--app", help="Only update the specified app. Omit or use 'all' to update all apps.")
+    args = parser.parse_args()
+
     try:
         config = json.loads(SOURCES_FILE.read_text(encoding="utf-8"))
         sources = config.get("sources") if isinstance(config, dict) else None
@@ -277,6 +282,41 @@ def main():
         if not isinstance(excluded_bundle_ids, list) or not all(isinstance(item, str) and item.strip() for item in excluded_bundle_ids):
             raise ValueError("excludedBundleIdentifiers must be an array of non-empty strings")
         source = build_source(catalogs, excluded_bundle_ids)
+
+        if args.app and args.app.lower() != "all":
+            existing = {}
+            if OUTPUT_FILE.exists():
+                try:
+                    existing = json.loads(OUTPUT_FILE.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    existing = {}
+            old_apps = existing.get("apps", []) if isinstance(existing, dict) else []
+            match = next(
+                (app for app in source["apps"]
+                 if app.get("name", "").casefold() == args.app.casefold()
+                 or app.get("bundleIdentifier", "").casefold() == args.app.casefold()),
+                None,
+            )
+            if match is None:
+                raise ValueError(f"Unknown app: {args.app}")
+            merged = list(old_apps) if isinstance(old_apps, list) else []
+            index = next(
+                (i for i, app in enumerate(merged)
+                 if isinstance(app, dict) and (
+                     app.get("bundleIdentifier") == match.get("bundleIdentifier")
+                     or app.get("name") == match.get("name")
+                 )),
+                None,
+            )
+            if index is None:
+                merged.append(match)
+            else:
+                merged[index] = match
+            source["apps"] = merged
+            source["featuredApps"] = [app["bundleIdentifier"] for app in merged if isinstance(app, dict)]
+            if isinstance(existing, dict):
+                source["news"] = existing.get("news", source.get("news", []))
+
         OUTPUT_FILE.write_text(
             json.dumps(source, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
