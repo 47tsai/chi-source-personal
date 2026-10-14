@@ -314,7 +314,9 @@ def update_readme(apps, old_apps, config):
         app_link = f"[{name}]({url})" if url else name
         latest = (app.get("versions") or [{}])[0]
         old = old_by_name.get(name)
-        old_version = ((old or {}).get("versions") or [{}])[0].get("version")
+        old_latest = ((old or {}).get("versions") or [{}])[0]
+        old_version = (old_latest.get("version"), old_latest.get("buildVersion", ""))
+        new_version_identity = (latest.get("version"), latest.get("buildVersion", ""))
         new_version = latest.get("version", "N/A")
         previous_time = previous_times.get(name)
         try:
@@ -324,7 +326,7 @@ def update_readme(apps, old_apps, config):
             ).total_seconds() < 86400
         except (TypeError, ValueError):
             recent = False
-        if old_version != new_version:
+        if old_version != new_version_identity:
             status = "**Updated**"
             status_times[name] = checked_at
         elif recent:
