@@ -24,6 +24,16 @@ VALID_CATEGORIES = {
     "other", "photo-video", "social", "utilities",
 }
 HEX_COLOR = re.compile(r"^#?[0-9a-fA-F]{6}$")
+SUBTITLE_OVERRIDES = {
+    "com.nianticlabs.pokemongo": "This is the SpooferPro tweak for Pokemon Go",
+    "org.animeko.animeko": "集找番、追番、看番的一站式弹幕追番平台，云收藏同步 (Bangumi)，离线缓存，BitTorrent，弹幕云过滤。",
+    "com.example.kazumi": "使用 Flutter 开发的基于自定义规则的番剧采集与在线观看程序。",
+    "app.aidoku.Aidoku": "A free and open source manga reading application for iOS, iPadOS, and macOS.",
+    "com.g8row.photosbackup": "An experimental, fully on-device iPhone app for backing up selected photos, videos, and albums to Google Photos.",
+    "com.mak5er.aircard": "Apple Wallet card skins, lock screen passcode themes, and PosterBoard wallpapers directly on iOS.",
+    "com.yangjiii.EnsWilde": "A tool utilizing itunesstored and bookassetd exploits for on-device iOS customization.",
+    "com.stik.stikdebug": "On-device JIT enabler and device toolbox.",
+}
 
 
 def create_session():
@@ -162,7 +172,7 @@ def normalize_app(raw, source_name):
         "name": name.strip(),
         "bundleIdentifier": bundle_id.strip(),
         "developerName": raw.get("developerName") or source_name,
-        "subtitle": raw.get("subtitle") or name.strip(),
+        "subtitle": raw.get("subtitle") or SUBTITLE_OVERRIDES.get(bundle_id.strip()) or name.strip(),
         "localizedDescription": raw.get("localizedDescription") or "",
         "iconURL": icon_url,
         "tintColor": tint,
