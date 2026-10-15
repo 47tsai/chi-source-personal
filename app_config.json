@@ -137,6 +137,23 @@
       "desc": "An on-device debugging utility for compatible iOS versions.",
       "color": "007AFF",
       "category": "developer"
+    },
+    {
+      "repo": "ResistanceTo/MiniWatts",
+      "name": "MiniWatts",
+      "bundleID": "org.zhaohe.MiniWatts",
+      "author": "ResistanceTo",
+      "repo_url": "https://github.com/ResistanceTo/MiniWatts",
+      "source_name": "AltGallery",
+      "source_url": "https://raw.githubusercontent.com/bebound/AltGallery/master/apps/MiniWatts/apps.json",
+      "icon": "https://raw.githubusercontent.com/bebound/AltGallery/refs/heads/master/apps/MiniWatts/icon.png",
+      "subtitle": "Battery, charging and thermal instrument",
+      "desc": "An iPhone battery and charging monitor built on Apple's private APIs: the charger's real watts, how much of that reaches the cell, where the rest goes as heat, and every temperature sensor in the phone. No network code — nothing it reads leaves your phone.",
+      "color": "30E0F0",
+      "category": "utilities",
+      "asset_keywords": [
+        "miniwatts"
+      ]
     }
   ]
 }
