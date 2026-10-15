@@ -32,12 +32,3 @@ https://ipap.chi.qzz.io
 <!-- {"AirCard-iOS": "2026-10-14 20:03:50", "EnsWilde": "2026-10-14 20:03:50", "Kazumi": "2026-10-15 04:30:15", "MiniWatts": "2026-10-15 18:37:00", "Photos Backup": "2026-10-14 20:03:50", "SpooferPro Pokemon GO": "2026-10-15 07:45:26", "StikDebug": "2026-10-14 20:03:50"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
-## 開發
-
-```bash
-pip install -r requirements.txt
-python -m pytest -q
-python update_source.py
-python update_source.py --app Animeko
-python validate_source.py
-```
