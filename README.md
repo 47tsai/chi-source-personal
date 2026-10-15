@@ -4,6 +4,8 @@ AltStore / SideStore Source。
 
 ## Source
 
+<a href="https://altdirect.app/?url=https://ipap.chi.qzz.io"><img src="https://altdirect.app/assets/png/AltSource_Blue.png" width="180" alt="Add Source with AltDirect"></a>
+
 ```text
 https://ipap.chi.qzz.io
 ```
