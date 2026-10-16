@@ -13,12 +13,12 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:START -->
 ## Apps 更新狀態
 
-- **最近自動檢查：** 2026-10-16 05:59:51（UTC+8）
+- **最近自動檢查：** 2026-10-16 08:17:25（UTC+8）
 - **最近內容更新：** 2026-10-16 02:55:35（UTC+8）
 
 | App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
 | --- | --- | --- | --- | --- | --- |
-| **[SpooferPro Pokemon GO](https://spooferpro.com)** | SpooferPro | **Updated** | 0.433.0 | 2026-10-14 | **2026-10-15** |
+| **[SpooferPro Pokemon GO](https://spooferpro.com)** | SpooferPro | Unchanged | 0.433.0 | 2026-10-14 | 2026-10-14 |
 | **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | Unchanged | 6.3.0 | 2026-10-13 | 2026-10-13 |
 | **[Kazumi](https://github.com/ChouChiu/Kazumi-AltStore-Source)** | Predidit | Unchanged | 2.3.9 | 2026-10-14 | 2026-10-14 |
 | **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Unchanged | 0.9 | 2026-09-03 | 2026-09-03 |
@@ -31,6 +31,6 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:END -->
 
 <!-- AUTO-UPDATE-STATUS-TIMES:START -->
-<!-- {"MiniWatts": "2026-10-15 18:37:00", "SpooferPro Pokemon GO": "2026-10-15 07:45:26", "StikDebug": "2026-10-16 02:55:35"} -->
+<!-- {"MiniWatts": "2026-10-15 18:37:00", "StikDebug": "2026-10-16 02:55:35"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
