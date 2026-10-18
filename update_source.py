@@ -18,7 +18,7 @@ SOURCE_NAME = "Chi Source Personal"
 SOURCE_IDENTIFIER = "com.tsai97216.chisourcepersonal"
 SOURCE_URL = "https://ipap.chi.qzz.io"
 SOURCE_WEBSITE = "https://github.com/tsai97216/chi-source-personal"
-SOURCE_ICON = "https://raw.githubusercontent.com/tsai97216/chi-source-personal/main/source_icon.png"
+SOURCE_ICON = "https://raw.githubusercontent.com/tsai97216/chi-design-system/main/logo/blue-w.png"
 VALID_CATEGORIES = {
     "developer", "entertainment", "games", "lifestyle",
     "other", "photo-video", "social", "utilities",
