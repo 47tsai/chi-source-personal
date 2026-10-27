@@ -13,8 +13,8 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:START -->
 ## Apps 更新狀態
 
-- **最近自動檢查：** 2026-10-27 12:00:51（UTC+8）
-- **最近內容更新：** 2026-10-25 00:00:58（UTC+8）
+- **最近自動檢查：** 2026-10-27 13:00:47（UTC+8）
+- **最近內容更新：** 2026-10-27 13:00:47（UTC+8）
 
 | App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
 | --- | --- | --- | --- | --- | --- |
@@ -26,11 +26,11 @@ https://ipap.chi.qzz.io
 | **[AirCard-iOS](https://github.com/Mak5er/AirCard-iOS)** | Mak5er | Unchanged | 1.3.2 | 2026-10-04 | 2026-10-04 |
 | **[EnsWilde](https://github.com/YangJiiii/EnsWilde)** | YangJiiii | Unchanged | 3.1.3 | 2026-02-25 | 2026-02-25 |
 | **[StikDebug](https://github.com/StephenDev0/StikDebug)** | StephenDev0 | Unchanged | 3.1.15 | 2026-10-15 | 2026-10-15 |
-| **[MiniWatts](https://github.com/ResistanceTo/MiniWatts)** | ResistanceTo | Unchanged | 1.5.1 | 2026-10-13 | 2026-10-13 |
+| **[MiniWatts](https://github.com/ResistanceTo/MiniWatts)** | ResistanceTo | **Updated** | 1.6.0 | 2026-10-27 | **2026-10-27** |
 
 <!-- AUTO-UPDATE-APPS:END -->
 
 <!-- AUTO-UPDATE-STATUS-TIMES:START -->
-<!-- {} -->
+<!-- {"MiniWatts": "2026-10-27 13:00:47"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
