@@ -20,7 +20,7 @@
   "apps": [
     {
       "name": "SpooferPro Pokemon GO",
-      "subtitle": "SpooferPro（2026-10-31）",
+      "subtitle": "SpooferPro（2026-11-12）",
       "bundleIdentifier": "com.nianticlabs.pokemongo",
       "tintColor": "#FFA900",
       "developerName": "SpooferPro",
@@ -75,6 +75,15 @@
         }
       ],
       "versions": [
+        {
+          "version": "0.435.2",
+          "buildVersion": "0.752",
+          "date": "2026-11-12T00:08:48+00:00",
+          "size": 162616872,
+          "downloadURL": "https://download.spooferpro.com/SpooferPro-0.435.2-0.752.RLS.ipa",
+          "localizedDescription": "SpooferPro-0.435.2-0.752.RLS.ipa",
+          "minOSVersion": "15.0"
+        },
         {
           "version": "0.435.1",
           "buildVersion": "0.743",
@@ -1584,10 +1593,10 @@
   ],
   "news": [
     {
-      "title": "SpooferPro 0.435.1",
-      "identifier": "0.435.1-0.743",
-      "caption": "0.435.1-0.743 is now supported",
-      "date": "2026-10-31T14:49:22+00:00",
+      "title": "SpooferPro 0.435.2",
+      "identifier": "0.435.2-0.752",
+      "caption": "0.435.2-0.752 is now supported",
+      "date": "2026-11-12T00:08:48+00:00",
       "tintColor": "#FFA900",
       "notify": true,
       "appID": "com.nianticlabs.pokemongo"
