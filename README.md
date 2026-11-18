@@ -13,13 +13,13 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:START -->
 ## Apps 更新狀態
 
-- **最近自動檢查：** 2026-11-19 03:01:29（UTC+8）
-- **最近內容更新：** 2026-11-14 23:01:31（UTC+8）
+- **最近自動檢查：** 2026-11-19 05:01:18（UTC+8）
+- **最近內容更新：** 2026-11-19 05:01:18（UTC+8）
 
 | App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
 | --- | --- | --- | --- | --- | --- |
 | **[SpooferPro Pokemon GO](https://spooferpro.com)** | SpooferPro | Unchanged | 0.435.2 | 2026-11-14 | 2026-11-14 |
-| **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | Unchanged | 6.4.0 | 2026-10-24 | 2026-10-24 |
+| **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | **Updated** | 6.4.1 | 2026-11-18 | **2026-11-19** |
 | **[Kazumi](https://github.com/ChouChiu/Kazumi-AltStore-Source)** | Predidit | Unchanged | 2.4.4 | 2026-11-12 | 2026-11-12 |
 | **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Unchanged | 0.9 | 2026-10-16 | 2026-10-16 |
 | **[Photos Backup](https://github.com/g8row/PhotosBackup)** | g8row | Unchanged | 0.3.8 | 2026-11-10 | 2026-11-10 |
@@ -31,6 +31,6 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:END -->
 
 <!-- AUTO-UPDATE-STATUS-TIMES:START -->
-<!-- {} -->
+<!-- {"Animeko": "2026-11-19 05:01:18"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
