@@ -1534,8 +1534,8 @@
     {
       "name": "StikDebug",
       "bundleIdentifier": "com.stik.stikdebug",
-      "developerName": "StikDebug",
-      "subtitle": "StikDebug（2026-11-08）",
+      "developerName": "StikDebug Team",
+      "subtitle": "StikDebug Team（2026-11-08）",
       "localizedDescription": "An on-device debugger and developer toolbox for iOS versions 17.4+ powered by idevice.  Note: Requires LocalDevVPN, cannot be natively used inside LiveContainer to enable JIT for the same LiveContainer.",
       "iconURL": "https://github.com/StikDebug/StikDebug/blob/main/assets/StikDebug.png?raw=true",
       "tintColor": "#3B86F7",
