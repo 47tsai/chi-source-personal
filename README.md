@@ -13,8 +13,8 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:START -->
 ## Apps 更新狀態
 
-- **最近自動檢查：** 2026-11-27 20:01:23（UTC+8）
-- **最近內容更新：** 2026-11-26 16:01:23（UTC+8）
+- **最近自動檢查：** 2026-11-27 21:01:25（UTC+8）
+- **最近內容更新：** 2026-11-27 21:01:25（UTC+8）
 
 | App | 原倉庫 | 狀態 | 最新版本 | 版本日期 | 上次更新 |
 | --- | --- | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ https://ipap.chi.qzz.io
 | **[Animeko](https://github.com/maxchang3/ani-altstore-source)** | openani | Unchanged | 6.4.1 | 2026-11-18 | 2026-11-18 |
 | **[Kazumi](https://github.com/ChouChiu/Kazumi-AltStore-Source)** | Predidit | Unchanged | 2.4.7 | 2026-11-26 | 2026-11-26 |
 | **[Aidoku](https://github.com/Aidoku/Aidoku)** | Skitty | Unchanged | 0.9 | 2026-10-16 | 2026-10-16 |
-| **[Photos Backup](https://github.com/g8row/PhotosBackup)** | g8row | Unchanged | 0.3.8 | 2026-11-10 | 2026-11-10 |
+| **[Photos Backup](https://github.com/g8row/PhotosBackup)** | g8row | **Updated** | 0.4.0 | 2026-11-27 | **2026-11-27** |
 | **[AirCard-iOS](https://github.com/Mak5er/AirCard-iOS)** | Mak5er | Unchanged | 1.3.2 | 2026-10-04 | 2026-10-04 |
 | **[EnsWilde](https://github.com/YangJiiii/EnsWilde)** | YangJiiii | Unchanged | 3.1.3 | 2026-02-25 | 2026-02-25 |
 | **[StikDebug](https://github.com/StephenDev0/StikDebug)** | StephenDev0 | Unchanged | 3.2.2 | 2026-11-08 | 2026-11-08 |
@@ -31,6 +31,6 @@ https://ipap.chi.qzz.io
 <!-- AUTO-UPDATE-APPS:END -->
 
 <!-- AUTO-UPDATE-STATUS-TIMES:START -->
-<!-- {} -->
+<!-- {"Photos Backup": "2026-11-27 21:01:25"} -->
 <!-- AUTO-UPDATE-STATUS-TIMES:END -->
 
